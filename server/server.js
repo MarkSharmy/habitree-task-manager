@@ -33,6 +33,11 @@ app.get('/', (req, res) => {
     res.send('Habitree API is running...');
 });
 
+// --- API ROUTES ---
+app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/groups', require('./routes/groupRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

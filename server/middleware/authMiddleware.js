@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const protect = async (req, res) => {
+const protect = async (req, res, next) => {
     let token;
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -11,17 +11,17 @@ const protect = async (req, res) => {
 
             //Attach user to the request object (excluding password)
             req.user = await User.findById(decoded.id).select('-password');
-            next();
+            return next();
 
         } catch(error) {
-            res.status(401).json({ success: false, message: 'Not authorized, token failed'});
+            return res.status(401).json({ success: false, message: 'Not authorized, token failed'});
         }
     }
 
     //If token is not defined
-    if (!token) {
-        res.status(401).json({ message: 'Not authorized, no token' });
-    }
+    if (!token) return res.status(401).json({ message: 'Not authorized, no token' });
+
+    //NOTE: Any code after this may cause Headers already sent error
 };
 
 module.exports = { protect };
