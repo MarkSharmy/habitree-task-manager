@@ -12,6 +12,7 @@ exports.registerUser = async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
+
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ success: false, message: 'User already exists'});
 
@@ -48,11 +49,13 @@ exports.loginUser = async (req, res) => {
                 role: user.role,
                 token: generateToken(user._id),
             });
+            
         } else {
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
 
     }catch(error) {
-        res.status(500).json({ success: false, message: error.message});
+
+        res.status(500).json({ success: false, message: error.message });
     }
 };
