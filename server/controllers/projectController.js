@@ -3,6 +3,7 @@ const Task = require('../models/task');
 const User = require('../models/user');
 const Session = require('../models/session');
 const { startSession } = require('./sessionController');
+const sendEmail = require('../utils/sendEmail');
 
 // @desc    Create a new project
 // @route   POST /api/projects
@@ -213,6 +214,57 @@ exports.removeCollaborator = async (req, res) => {
 
         await project.save();
         return res.status(200).json({ success: true, message: 'Collaborator removed '});
+
+    }catch(error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+// @desc    Invite a collaborator via email
+// @route   POST /api/projects/:id/invite
+exports.inviteCollaborator = async (req, res) => {
+    const { email } = req.body;
+    const projectId = req.params.id;
+
+    try {
+        // 1. Find the project and verify the requester is the owner
+        const project = await Project.findOne({ _id: projectId, owner: req.user.id });
+        if(!project) return res.status(404).json({ success: false, message: 'Project not found' });
+
+        // 2. Find the recipient user in the database
+        const recipient = await User.findOne({ email });
+        if(!recipient) return res.status(404).json({ success: false, message: 'User not found' });
+
+        // 3. Prevent adding the owner or duplicate collaborators
+        if (recipient._id.toString() === project.owner.toString()) {
+            return res.status(400).json({ success: false, message: 'You are already the owner of this project' });
+        }
+
+        if (project.collaborators.includes(recipient._id)) {
+            return res.status(400).json({ message: 'User already a collaborator'});
+        }
+
+        // 4. Update the Project Schema
+        project.collaborators.push(recipient._id);
+        await project.save();
+
+        // 5. Notify the recipient via Email
+        const message = `Hello ${recipient.username}, \n\n${req.user.username} has invited you to collaborate on the project: "${project.name}" on Habitree. Log in to start working!`
+        
+        await sendEmail({
+            email: recipient.email,
+            subject: `Invitation to collaborate: ${project.name}`,
+            message
+        });
+
+        //Notify the recipient via socket.io
+        req.io.to(recipient._id.toString()).emit('notification', {
+            type: 'INVITE',
+            message: `You were added to ${project.name}`,
+            projectId: project._id
+        });
+
+        res.status(200).json({ success: true, message: 'Collaborator added and notified' });
 
     }catch(error) {
         res.status(500).json({ success: false, message: error.message });
