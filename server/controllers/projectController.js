@@ -1,6 +1,7 @@
 const Project = require('../models/project');
 const Task = require('../models/task');
 const User = require('../models/user');
+const Session = require('../models/session');
 const { startSession } = require('./sessionController');
 
 // @desc    Create a new project
@@ -14,7 +15,7 @@ exports.createProject = async(req, res) => {
             owner: req.user.id,
             collaborators
         });
-        res.status(201).json( success: true, project);
+        res.status(201).json({success: true, project});
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -74,7 +75,7 @@ exports.deleteProject = async (req, res) => {
         res.json({ success: true, message: "Project and associated tasks deleted" });
         
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message })''
+        res.status(500).json({ success: false, message: error.message });
     }
 }
 
@@ -84,32 +85,73 @@ exports.moveTask = async(req, res) => {
     const { taskId, fromColumn, toColumn } = req.body;
     const projectId = req.params.id;
 
-    try{
+    try {
+        
         const project = await Project.findOne({ _id: projectId });
-        if(!project) return res.status(404).json({ message: "Project not found" });
+        if(!project) return res.status(404).json({ success: false, message: 'Project not found' });
 
-        // 1. Remove from source column
-        project.kanban[fromColumn] = project.kanban[fromColumn].filter(
-            id => id.toString() !== taskId
-        );
-
-        // 2. Add to destination column
+        // 1. Column logic
+        project.kanban[fromColumn] = project.kanban[fromColumn].filter( id => id.toString() !== taskId);
         project.kanban[toColumn].push(taskId);
 
-        // 3. The Bridge: If move to 'doing, update the Task's scheduled date
-        if(toColumn === 'doing') {
-            await Task.findByIdAndUpdate(taskId, {
-                scheduledDate: new Date(),
-                status: 'Not Started'
-            });
-            //Add Session on daily scheduler
-            await startSession(req, res);
-        }
-        
-        await project.save();
-        res.status(200).json({ success: true, message: 'successfully moved item', project });
+        //IF ENTERING 'DOING': Start a session
+        if (toColumn === 'doing') {
+            //Safety: Check if there's already an active session for this task/user
+            const existingSession = await Session.findOne({ taskId, userId: req.user.id });
 
-    }catch(error) {
+            if(!existingSession) {
+                await Session.create({
+                    userId: req.user.id,
+                    taskId: taskId,
+                    startTime: Date.now()
+                });
+            }
+
+            //Sync Task Status & Date
+            await Task.findByIdAndUpdate(taskId, {
+                status: 'Doing',
+                scheduledDate: new Date()
+            });
+        }
+
+        //CASE B: Leaving 'Doing' -> Stop Session
+        if(fromColumn === 'doing') {
+            const activeSession = await Session.findOne({
+                taskId,
+                userId: req.user.id
+            });
+
+            if(activeSession) {
+
+                const endTime = Date.now();
+                const durationSeconds = Math.floor((endTime - activeSession.startTime) / 1000);
+                
+                activeSession.endTime = endTime;
+                activeSession.duration = durationSeconds;
+                activeSession.isCompleted = true;
+
+                await activeSession.save();
+
+                //Increment total time on the Task itself
+                await Task.findByIdAndUpdate(taskId, {
+                    $inc: { totalTimeSpent: durationSeconds }
+                });
+            }
+        }
+
+        // 3. Save Project and Emit via Sockiet.io
+        await project.save();
+
+        req.io.to(projectId).emit('taskMoved', {
+            taskId,
+            fromColumn, 
+            toColumn,
+            user: req.user.username
+        });
+
+        res.json({ success: true, project });
+
+    } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 }

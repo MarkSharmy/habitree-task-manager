@@ -7,6 +7,8 @@ const sessionSchema = new mongoose.Schema({
     endTime: { type: Date },
     duration: { type: Number, default: 0 },
     isCompleted: { type: Boolean, default: false }
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Session', sessionSchema);

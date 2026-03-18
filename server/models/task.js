@@ -31,6 +31,7 @@ const TaskSchema = new mongoose.Schema({
 
     //Stats for the efficiency score
     totalTimeSpent: { type: Number, default: 0 }, //in seconds
+    estimatedTime: { type: Number, default: 3600 },
     createdAt: { type: Date, default: Date.now }
 });
 
