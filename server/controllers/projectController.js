@@ -146,7 +146,8 @@ exports.moveTask = async(req, res) => {
             taskId,
             fromColumn, 
             toColumn,
-            user: req.user.username
+            user: req.user.username,
+            timestamp: new Date()
         });
 
         res.json({ success: true, project });
