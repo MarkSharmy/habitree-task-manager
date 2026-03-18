@@ -67,6 +67,10 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('User disconnected');
     });
+
+    socket.on('joinUserRoom', (userId) => {
+        socket.join(userId);
+    })
 });
 
 const PORT = process.env.PORT || 5000;

@@ -4,7 +4,8 @@ const { protect } = require('../middleware/authMiddleware');
 
 const {
     createProject,
-    getProject,
+    getSingleProject,
+    getProjects,
     updateProject,
     deleteProject,
     moveTask,
@@ -16,10 +17,11 @@ router.use(protect);
 
 //CRUD Routers
 router.route('/')
-    .get(getProject)
+    .get(getProjects)
     .post(createProject);
 
 router.route('/:id')
+    .get(getSingleProject),
     .put(updateProject),
     .delete(deleteProject);
 

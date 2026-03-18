@@ -3,6 +3,7 @@ const Task = require('../models/task');
 const User = require('../models/user');
 const Session = require('../models/session');
 const { startSession } = require('./sessionController');
+const Notification = require('../models/notification');
 const sendEmail = require('../utils/sendEmail');
 
 // @desc    Create a new project
@@ -23,9 +24,23 @@ exports.createProject = async(req, res) => {
     }
 }
 
+// @desc    Get project matching ID
+// @route   GET /api/projects/:id
+exports.getSingleProject = async (req, res) => {
+    try {
+        const projectId = await Project.findById(req.params.id);
+        if(!project) return res.status(404).json({ success: false, message: "Project not found" });
+
+        res.json({ success: true, project });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
 // @desc    Get all projects user is part of (Owner or Collaborator)
 // @route   GET /api/projects
-exports.getProject = async (req, res) => {
+exports.getProjects = async (req, res) => {
     try{
         const projects = await Project.find({
             $or: [{ owner: req.user.id }, { collaborators: req.user.id }]
@@ -87,19 +102,14 @@ exports.moveTask = async(req, res) => {
     const projectId = req.params.id;
 
     try {
-        
-        const project = await Project.findOne({ _id: projectId });
+        const project = await Project.findById(projectId);
         if(!project) return res.status(404).json({ success: false, message: 'Project not found' });
 
-        // 1. Column logic
-        project.kanban[fromColumn] = project.kanban[fromColumn].filter( id => id.toString() !== taskId);
+        project.kanban[fromColumn] = project.kanban[fromColumn].filter(id => id.toString() !== taskId);
         project.kanban[toColumn].push(taskId);
 
-        //IF ENTERING 'DOING': Start a session
         if (toColumn === 'doing') {
-            //Safety: Check if there's already an active session for this task/user
-            const existingSession = await Session.findOne({ taskId, userId: req.user.id });
-
+            const existingSession = await Session.findOne({ taskId, userId: req.user.id, isCompleted: false });
             if(!existingSession) {
                 await Session.create({
                     userId: req.user.id,
@@ -107,52 +117,27 @@ exports.moveTask = async(req, res) => {
                     startTime: Date.now()
                 });
             }
-
-            //Sync Task Status & Date
-            await Task.findByIdAndUpdate(taskId, {
-                status: 'Doing',
-                scheduledDate: new Date()
-            });
+            await Task.findByIdAndUpdate(taskId, { status: 'Doing', scheduledDate: new Date() });
         }
 
-        //CASE B: Leaving 'Doing' -> Stop Session
         if(fromColumn === 'doing') {
-            const activeSession = await Session.findOne({
-                taskId,
-                userId: req.user.id
-            });
-
+            const activeSession = await Session.findOne({ taskId, userId: req.user.id, isCompleted: false });
             if(activeSession) {
-
                 const endTime = Date.now();
                 const durationSeconds = Math.floor((endTime - activeSession.startTime) / 1000);
                 
                 activeSession.endTime = endTime;
                 activeSession.duration = durationSeconds;
                 activeSession.isCompleted = true;
-
                 await activeSession.save();
 
-                //Increment total time on the Task itself
-                await Task.findByIdAndUpdate(taskId, {
-                    $inc: { totalTimeSpent: durationSeconds }
-                });
+                await Task.findByIdAndUpdate(taskId, { $inc: { totalTimeSpent: durationSeconds } });
             }
         }
 
-        // 3. Save Project and Emit via Sockiet.io
         await project.save();
-
-        req.io.to(projectId).emit('taskMoved', {
-            taskId,
-            fromColumn, 
-            toColumn,
-            user: req.user.username,
-            timestamp: new Date()
-        });
-
+        req.io.to(projectId).emit('taskMoved', { taskId, fromColumn, toColumn, user: req.user.username });
         res.json({ success: true, project });
-
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -249,22 +234,21 @@ exports.inviteCollaborator = async (req, res) => {
         await project.save();
 
         // 5. Notify the recipient via Email
-        const message = `Hello ${recipient.username}, \n\n${req.user.username} has invited you to collaborate on the project: "${project.name}" on Habitree. Log in to start working!`
-        
-        await sendEmail({
-            email: recipient.email,
-            subject: `Invitation to collaborate: ${project.name}`,
-            message
-        });
-
-        //Notify the recipient via socket.io
-        req.io.to(recipient._id.toString()).emit('notification', {
+        const notification = awit Notification.create({
+            recipient: recipient._id,
+            sender: req.user.id,
             type: 'INVITE',
-            message: `You were added to ${project.name}`,
-            projectId: project._id
+            message: `You have been added to the project: ${project.name}`,
+            projectId: project._id,
         });
 
-        res.status(200).json({ success: true, message: 'Collaborator added and notified' });
+        // 6. Send socket io Alert (Live)
+        req.io.to(recipient._id.toString()).emit('newNotification', notification);
+
+        // 7. Send Email (Offline)
+        await sendEmail({ email: recipient.email, ... });
+
+        res.json({ success: true, message: "Collaborator invited successfully" });
 
     }catch(error) {
         res.status(500).json({ success: false, message: error.message });
