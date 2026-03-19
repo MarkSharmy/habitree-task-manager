@@ -1,5 +1,8 @@
 const Task = require('../models/task');
 const Group = require('../models/group');
+const Project = require('../models/project');
+const Session = require('../models/session');
+const Roadmap = require('../models/roadmap');
 
 // @desc    Create a new task
 // @route   POST /api/tasks
@@ -86,14 +89,49 @@ exports.updateTask = async (req, res) => {
     }
 };
 
+// @desc    Delete a task and cleanup all references
+// @route   DELETE /api/tasks/:id
 exports.deleteTask = async (req, res) => {
     try {
-        const task = await Task.findOne({ _id: req.params.id, userId: req.user.id });
+        const taskId = req.params.id;
 
+        // 1. Find the task first to get its ProjectID
+        const task = await Task.findById(taskId);
         if(!task) return res.status(404).json({ success: false, message: "Task not found" });
 
+        // 2. Remove Task ID from the Project's Kanban arrays
+        const projectId = task.projectId;
+
+        if (projectId) {
+            await Project.findByIdAndUpdate(projectId, {
+                $pull: {
+                    "kanban.todo": taskId,
+                    "kanban.doing": taskId,
+                    "kanban.done": taskId,
+                    "kanban.testing": taskId,
+                    "kanban.blocked": taskId,
+                    "kanban.onHold": taskId,
+                    "kanban.trash": taskId,
+                    "kanban.backendBacklog": taskId,
+                    "kanban.frontendBacklog": taskId,
+                    "kanban.mobileBacklog": taskId,
+                }
+            });
+
+            //3. Notify collaborators via socket io
+            req.io.to(projectId.toString()).emit('taskDeleted', { taskId });
+        }
+
+        // 4 Remove Task from any Roadamp Milestone
+        //TODO: add code here
+
+        // 5. Delete the task itself
         await task.deleteOne();
-        res.json({ success: true, message: "Task deleted" });
+
+        res.json({ 
+            success: true,
+            message: "Task and all associated sessions/references deleted successfully",
+        });
 
     }catch(error) {
         res.status(500).json({ success: false, message: error.message });

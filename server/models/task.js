@@ -12,6 +12,7 @@ const TaskSchema = new mongoose.Schema({
 
     //Categorization
     groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', default: null },
+    projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', default: null },
     category: {
         type: String,
         enum: ['General', 'Watch', 'Read', 'Practice', 'Note', 'Project'],
