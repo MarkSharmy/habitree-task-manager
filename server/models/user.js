@@ -10,7 +10,12 @@ const UserSchema = new mongoose.Schema({
         enum: ['Master', 'Admin', 'Collaborator'],
         default: 'Admin'
     },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: {
+        type: Date, default: Date.now
+    },
+    settings: {
+        autoRollover: { type: Boolean, default: true },
+    }
 });
 
 UserSchema.pre('save', async function() {

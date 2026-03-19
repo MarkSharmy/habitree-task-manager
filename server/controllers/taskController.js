@@ -117,10 +117,38 @@ exports.deleteTask = async (req, res) => {
     }
 }
 
+const handleTaskRollover = async (userId) => {
+    const user = await User.findById(userId);
+
+    // If user turned off rollver, exit early
+    if(!user.settings.autoRollover) return;
+
+    const startOfToday = new Date();
+    startOfToday.setHour(0, 0, 0, 0);
+
+    const unfinishedTasks = await Task.find({
+        userId,
+        scheduledDate: { $lt: startOfToday, $ne: null },
+        status: { $in: ['Not Started', 'On-Going'] }
+    });
+
+    if (unfinishedTasks.length > 0) {
+        //Update all these tasks to be scheduled for today
+        await Task.updateMany(
+            { _id: { $in: unfinishedTasks.map(t => t._id )}},
+            { $set: { scheduledDate: startOfToday } }
+        );
+        console.log(`Rolled over ${unfinishedTasks.length} tasks for user: ${userId}`);
+    }
+}
+
 // @desc    Get all tasks scheduled for today
 // @route   GET /api/tasks/planner/today
 exports.getDailyPlanner = async (req, res) => {
     try {
+
+        await handleTaskRollover(req.user.id);
+
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
 
@@ -132,7 +160,12 @@ exports.getDailyPlanner = async (req, res) => {
             scheduledDate: { $gte: startOfToday, $lte: endOfToday },
         }).sort({ scheduledDate: -1 });
 
-        res.json({ success: true, count: tasks.length, tasks });
+        res.json({
+            success: true,
+            rolloverActive: req.user.settings.autoRollover,
+            count: tasks.length,
+            tasks
+        });
         
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -245,3 +278,5 @@ exports.updateTaskStatus = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
+
+

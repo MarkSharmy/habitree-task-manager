@@ -4,32 +4,44 @@ const { protect } = require('../middleware/authMiddleware');
 
 const {
     createProject,
-    getSingleProject,
     getProjects,
+    getSingleProject,
     updateProject,
     deleteProject,
     moveTask,
-    addCollaborator,
+    inviteCollaborator,
     removeCollaborator,
 } = require('../controllers/projectController');
 
+// All project interactions require authentication
 router.use(protect);
 
-//CRUD Routers
+// --- Core Project CRUD ---
+
+// @route   POST /api/projects (Create a new project)
+// @route   GET /api/projects (Get all projects I own or collaborate on)
 router.route('/')
-    .get(getProjects)
-    .post(createProject);
+    .post(createProject)
+    .get(getProjects);
 
+// @route   GET /api/projects/:id (Fetch full board data)
+// @route   PUT /api/projects/:id (Edit title/description)
+// @route   DELETE /api/projects/:id (Full cleanup of project & tasks)
 router.route('/:id')
-    .get(getSingleProject),
-    .put(updateProject),
-    .delete(deleteProject);
+    .get(getSingleProject)
+    .put(updateProject)
+    .delete(deleteProject)
 
-//Specialized Kanban logic
-router.put(':/id/move', moveTask);
+// --- Kanban & Collaboration Features ---
 
-//Collborator Management
-router.post('/:id/collaborators', addCollaborator);
+// @route   PUT /api/projects/:id/move (The Bridge: Moves tasks + Starts/Stops Sessions)
+router.put('/:id/move', moveTask);
+
+// @route   POST /api/projects/:id/invite (Email-based invitation + Notification)
+router.post('/:id/invite', inviteCollaborator);
+
+// @route   DELETE /api/projects/:id/collaborators/:userId (Remove a team member)
 router.delete('/:id/collaborators/:userId', removeCollaborator);
+
 
 module.exports = router;
