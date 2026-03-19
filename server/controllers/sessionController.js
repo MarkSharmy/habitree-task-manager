@@ -27,7 +27,8 @@ exports.stopSession = async (req, res) => {
     try {
         const session = await Session.findOne({
             _id: req.params.id,
-            userId: req.user.id
+            userId: req.user.id,
+            isCompleted: false
         });
 
         if (!session) return res.status(404).json({ success: false, message: 'Active session not found' });

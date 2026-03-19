@@ -2,7 +2,7 @@ const Task = require('../models/task');
 const Group = require('../models/group');
 const Project = require('../models/project');
 const Session = require('../models/session');
-const Roadmap = require('../models/roadmap');
+//const Roadmap = require('../models/roadmap');
 
 // @desc    Create a new task
 // @route   POST /api/tasks
@@ -25,7 +25,7 @@ exports.createTask = async (req, res) => {
     }catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-};
+}
 
 // @desc    Get all tasks grouped by their user-defined Groups
 // @route   GET /api/tasks
@@ -48,28 +48,7 @@ exports.getGroupedTasks = async (req, res) => {
     });
 
     res.json(organized);
-};
-
-// @desc    Get tasks fro a specific date (Daily Planner)
-// @route   GET /api/tasks/planner/:date
-exports.getTasksByDay = async (req, res) => {
-
-    try {
-        const date = new Date(req.params.date);
-        const start = new Date(date.setHours(0, 0, 0, 0));
-        const end = new Date(date.setHours(23, 59, 59, 999));
-
-        const tasks = await Task.find({
-            userId: req.user.id,
-            scheduledDate: { $gte: start, $lte: end },
-        });
-
-        res.json(tasks);
-
-    }catch(error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+}
 
 // @desc    Update task (Status, Subtasks, Time Tracking)
 // @route   PUT /api/tasks/:id
@@ -87,7 +66,7 @@ exports.updateTask = async (req, res) => {
     }catch( error) {
         res.status(500).json({ success: false, message: error.message});
     }
-};
+}
 
 // @desc    Delete a task and cleanup all references
 // @route   DELETE /api/tasks/:id
@@ -136,4 +115,133 @@ exports.deleteTask = async (req, res) => {
     }catch(error) {
         res.status(500).json({ success: false, message: error.message });
     }
-};
+}
+
+// @desc    Get all tasks scheduled for today
+// @route   GET /api/tasks/planner/today
+exports.getDailyPlanner = async (req, res) => {
+    try {
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
+
+        const tasks = await Task.find({
+            userId: req.user.id,
+            scheduledDate: { $gte: startOfToday, $lte: endOfToday },
+        }).sort({ scheduledDate: -1 });
+
+        res.json({ success: true, count: tasks.length, tasks });
+        
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+// @desc    Get tasks fro a specific date (Daily Planner)
+// @route   GET /api/tasks/planner/:date
+exports.getTasksByDay = async (req, res) => {
+
+    try {
+        const baseDate = new Date(req.params.date);
+
+        const start = new Date(baseDate);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(baseDate);
+        end.setHours(23, 59, 59, 999);
+
+        const tasks = await Task.find({
+            userId: req.user.id,
+            scheduledDate: { $gte: start, $lte: end },
+        });
+
+        res.json({ success: true, tasks });
+
+    }catch(error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+// @desc    Schedule a task for a specific date
+// @route   PUT /api/tasks/:id/schedule
+exports.scheduleTask = async (req, res) => {
+    try {
+        const { dateString } = req.body; // expecting ISO date string
+        const date = new Date(dateString);
+        if(isNaN(date.getTime())) return res.status(400).json({ success: false, message: "Incorrect date format" });
+
+        const task = await Task.findOneAndUpdate(
+            { _id: req.params.id, userId: req.user.id },
+            { scheduledDate: new Date(date) },
+            { new: true }
+        );
+
+        if (!task) return res.status(404).json({ success: false, message: "Task not found" });
+
+        res.json({ success: true, task });
+        
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+// @desc    Update task status and sync with Kanban
+exports.updateTaskStatus = async (req, res) => {
+    const { status } = req.body;
+    try {
+        const task = await Task.findOneAndUpdate(
+            { _id: req.params.id, userId: req.user.id },
+            { status },
+            { new: true }
+        );
+
+        if(!task) return res.status(404).json({ success: false, message: "Task not found" });
+
+        // CRITICAL: Sync with Project Kanban
+        const project = await Project.findById(task.projectId);
+        
+        if(task.projectId) {
+            const project = await Project.findById(task.projectId);
+
+            if (project) {
+                // 1. Remove from all existing columns
+                Object.keys(project.kanban).forEach(col => {
+                    // Ensure we only filter if the property is an array
+                    if (Array.isArray(project.kanban[col])) {
+                        project.kanban[col] = project.kanban[col].filter(id => id.toString() !== task._id.toString());
+                    }
+                });
+            
+                // 2. Map Task status to Kanban column
+                let targetColumn; 
+            
+                switch(status) {
+                    case 'Completed': // No colon after 'case'
+                        targetColumn = 'done';
+                        break;
+                    case 'On-Going':
+                        targetColumn = 'doing';
+                        break;
+                    case 'Shelved':
+                    case 'Not Started': // Added this to handle your model default
+                        targetColumn = 'todo';
+                        break;
+                    default:
+                        // Use a return here to stop execution if the status is invalid
+                        return res.status(400).json({ success: false, message: "Status incorrectly formatted" });
+                }
+            
+                // 3. Push to the new column and save
+                project.kanban[targetColumn].push(task._id);
+                await project.save();
+            }
+        }
+
+        res.json({ success: true, task });
+        
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}

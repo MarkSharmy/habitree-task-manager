@@ -29,12 +29,8 @@ const TaskSchema = new mongoose.Schema({
 
     //Daily Planner Integration
     scheduledDate: { type: Date, default: null },
-
-    //Stats for the efficiency score
-    totalTimeSpent: { type: Number, default: 0 }, //in seconds
-    estimatedTime: { type: Number, default: 3600 },
-    createdAt: { type: Date, default: Date.now }
-});
+    
+}, { timestamps: true });
 
 module.exports = mongoose.model('Task', TaskSchema);
 
