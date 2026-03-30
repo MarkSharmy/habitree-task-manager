@@ -32,5 +32,32 @@ const TaskSchema = new mongoose.Schema({
     
 }, { timestamps: true });
 
+//Middleware to calculate progress and sync with Roadmaps
+TaskSchema.post('save', async function(doc) {
+
+    // 1. Calculate progress percentage based on subtasks
+    let progress = 0;
+    if (doc.subtasks && doc.subtasks.length > 0) {
+        const completed = doc.subtasks.filter(st => st.isCompleted).length;
+        progress = Math.round((completed / doc.subtasks.length) * 100);
+    }
+    else if (doc.status === 'Completed') {
+        progress = 100;
+    }
+
+    // 2. Update all Roadmaps that contain this task as a node
+    const Roadmap = mongoose.model('Roadmap');
+    await Roadmap.updateMany(
+        { "nodes.id": doc._id.toString() },
+        {
+            $set: {
+                "nodes.$.data.progress": progress,
+                "nodes.$.data.status": doc.status
+            }
+        }
+    );
+
+});
+
 module.exports = mongoose.model('Task', TaskSchema);
 

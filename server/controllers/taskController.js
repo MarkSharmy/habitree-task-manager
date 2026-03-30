@@ -102,7 +102,15 @@ exports.deleteTask = async (req, res) => {
         }
 
         // 4 Remove Task from any Roadamp Milestone
-        //TODO: add code here
+        await Roadmap.findOneAndUpdate({
+            { taskId: taskId },
+            { 
+                $pull: {
+                    nodes: { id: taskId },
+                    edges: { $or: [{ source: taskId }, { target: taskId }]}
+                }
+            }
+        });
 
         // 5. Delete the task itself
         await task.deleteOne();

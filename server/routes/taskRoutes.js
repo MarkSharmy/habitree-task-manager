@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
+const { checkPrerequisites } = require('../middleware/dependencyMiddleware');
 
 const {
     createTask,
@@ -42,6 +43,6 @@ router.put('/planner/:date', getTasksByDay);
 router.put('/:id/schedule', scheduleTask);
 
 // @route   PUT /api/tasks/:id/status (Update status + Sync with Kanban)
-router.put('/:id/status', updateTaskStatus);
+router.put('/:id/status', checkPrerequisites, updateTaskStatus);
 
 module.exports = router;
