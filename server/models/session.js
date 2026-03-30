@@ -1,14 +1,31 @@
 const mongoose = require('mongoose');
 
 const sessionSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
-    taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'task', required: true},
-    startTime: { type: Date, default: Date.now },
-    endTime: { type: Date },
-    duration: { type: Number, default: 0 },
-    isCompleted: { type: Boolean, default: false }
-}, {
-    timestamps: true
-});
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    startTime: {
+        type: Date, 
+        required: true
+    },
+    endTime: {
+        type: date
+    },
+    durationMinutes: {
+        type: Number,
+        default: 0
+    },
+    status: {
+        type: String.
+        enum: ["In Progress", "Completed", "Shelved"],
+        required: true
+    },
+    date: {
+        type: Date, 
+        default: Date.now
+    }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Session', sessionSchema);

@@ -4,19 +4,13 @@ const Task = require('../models/task');
 // @desc    Start a work session
 exports.startSession = async (req, res) => {
     try {
-        const { taskId } = req.body;
-
-        //Ensure the task exists
-        const task = await Task.findById(taskId);
-        if(!task) return res.status(404).json({ success: false, message: 'Task not found' });
-
         const session = await Session.create({
             userId: req.user.id,
-            taskId
+            startTime: new Date(),
+            status: 'In Progress'
         });
-
-        res.status(201).json({ success: true, session });
         
+        res.status(201).json({ success: true, session });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -25,28 +19,19 @@ exports.startSession = async (req, res) => {
 // @desc    Stop a work session and update task total time
 exports.stopSession = async (req, res) => {
     try {
-        const session = await Session.findOne({
-            _id: req.params.id,
-            userId: req.user.id,
-            isCompleted: false
-        });
+        const { durationMinutes } = req.body; // calculated by frontend timer
+        const session = await Session.findOneAndUpdate(
+            { _id: req.params.id, userId: req.user.id },
+            {
+                endTime: new Date(),
+                durationMinutes,
+                status: 'Completed'
+            },
+            { new: true }
+        );
 
-        if (!session) return res.status(404).json({ success: false, message: 'Active session not found' });
-
-        session.endTime = Date.now();
-        //Calculate duration in seconds
-        session.duration = Math.floor((session.endTime - session.startTime) / 1000 );
-        session.isCompleted = true;
-
-        await session.save();
-
-        //Update the Task's cumulative time
-        await Task.findByIdAndUpdate(session.taskId, {
-            $inc: { totalTimeSpent: session.duration }
-        });
-
-        res.status(200).json({ success: true, session });
-
+        res.json({ success: true, session });
+        
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

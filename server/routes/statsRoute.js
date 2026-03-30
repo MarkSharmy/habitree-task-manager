@@ -6,7 +6,7 @@ const {
     getDailyEffort,
     getWeeklyStats,
     getMonthlyStats,
-    getTaskEfficiency,
+    getTaskVolumeStats,
 } = require('../controllers/statsController');
 
 // All stats are private to the logged-in user
@@ -28,9 +28,8 @@ router.get('/weekly', getWeeklyStats);
 // Monthly trend analysis
 router.get('/monthly', getMonthlyStats);
 
-// @route   GET /api/stats/task/:taskId
-// Specific efficiency for a single task
-router.get('/task/:taskId', getTaskEfficiency);
+// @route   GET /api/stats/tasks
+router.get('/tasks', getTaskVolumeStats);
 
 
 module.exports = router;
