@@ -1,4 +1,4 @@
-const Session = require('../modals/session');
+const Session = require('../models/session');
 const Task = require('../models/task');
 const mongoose = require('mongoose');
 
@@ -16,20 +16,20 @@ exports.getTodayOverview = async (req, res) => {
             status: 'Completed'
         });
 
-        const totalMinutesTodays = sessions.reduce((acc, sess) => acc + (sess.durationMinutes || 0), 0);
+        const totalMinutesToday = sessions.reduce((acc, sess) => acc + (sess.durationMinutes || 0), 0);
         const totalHoursToday = parseFloat((totalMinutesToday /60).toFixed(2));
 
         const EIGHT_HOURS_IN_MINUTES = 8 * 60;
 
         // Calculate Efficiency score (Productive Hours / 8)
-        const dailyEfficiencyScore = Math.round( (totalMinutesToday / EIGHT_HOURS_IN_MINUTES) / 100 );
+        const dailyEfficiencyScore = Math.round( (totalMinutesToday / EIGHT_HOURS_IN_MINUTES) * 100 );
 
         res.json({
             success: true,
             date: startofToday.toISOString().split('T')[0],
             metrics: {
                 totalMinutes: totalMinutesToday,
-                totalHours: totalHoursTodaya,
+                totalHours: totalHoursToday,
                 efficiencyScore: `${dailyEfficiencyScore}`,
             },
             sessionsCount: sessions.length
@@ -59,7 +59,7 @@ exports.getWeeklyStats = async (req, res) => {
             {
                 $group: {
                     _id: { $dateToString: { format: '%Y-%m-%d', date: "$startTime" } },
-                    totalMintes: { $sum: '$durationMinutes' },
+                    totalMinutes: { $sum: '$durationMinutes' },
                     sessionCount: { $sum: 1}
                 }
             },

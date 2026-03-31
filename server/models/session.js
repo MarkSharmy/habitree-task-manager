@@ -25,6 +25,15 @@ const sessionSchema = new mongoose.Schema({
     date: {
         type: Date, 
         default: Date.now
+    },
+    mobileSyncId: {
+        type: String,
+        unique: true,
+        sparse: true,
+    },
+    isConflict: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 
