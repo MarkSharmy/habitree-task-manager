@@ -2,7 +2,13 @@ const mongoose = require('mongoose');
 
 const SubtaskSchema = new mongoose.Schema({
     title: { type: String, required: true },
-    isCompleted: { type: Boolean, default: false }
+    isCompleted: { type: Boolean, default: false },
+    scheduledDate: { type: Date, default null },
+    status: {
+        type: String,
+        enum: ['Not Started', 'On-Going', 'Completed', 'Shelved'],
+        default: 'Not Started'
+    }
 });
 
 const TaskSchema = new mongoose.Schema({

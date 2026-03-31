@@ -2,7 +2,8 @@ const Task = require('../models/task');
 const Group = require('../models/group');
 const Project = require('../models/project');
 const Session = require('../models/session');
-//const Roadmap = require('../models/roadmap');
+const Roadmap = require('../models/roadmap');
+const rolloverIncompleteItems = require('../utils/rolloverLogic');
 
 // @desc    Create a new task
 // @route   POST /api/tasks
@@ -102,15 +103,10 @@ exports.deleteTask = async (req, res) => {
         }
 
         // 4 Remove Task from any Roadamp Milestone
-        await Roadmap.findOneAndUpdate({
-            { taskId: taskId },
-            { 
-                $pull: {
-                    nodes: { id: taskId },
-                    edges: { $or: [{ source: taskId }, { target: taskId }]}
-                }
-            }
-        });
+        await Roadmap.findOneAndUpdate(
+            { "nodes.id": taskId }, 
+            { $pull: { nodes: { id: taskId }, edges: { $or: [{ source: taskId }, { target: taskId }] } } }
+        );
 
         // 5. Delete the task itself
         await task.deleteOne();
@@ -125,37 +121,13 @@ exports.deleteTask = async (req, res) => {
     }
 }
 
-const handleTaskRollover = async (userId) => {
-    const user = await User.findById(userId);
-
-    // If user turned off rollver, exit early
-    if(!user.settings.autoRollover) return;
-
-    const startOfToday = new Date();
-    startOfToday.setHour(0, 0, 0, 0);
-
-    const unfinishedTasks = await Task.find({
-        userId,
-        scheduledDate: { $lt: startOfToday, $ne: null },
-        status: { $in: ['Not Started', 'On-Going'] }
-    });
-
-    if (unfinishedTasks.length > 0) {
-        //Update all these tasks to be scheduled for today
-        await Task.updateMany(
-            { _id: { $in: unfinishedTasks.map(t => t._id )}},
-            { $set: { scheduledDate: startOfToday } }
-        );
-        console.log(`Rolled over ${unfinishedTasks.length} tasks for user: ${userId}`);
-    }
-}
 
 // @desc    Get all tasks scheduled for today
 // @route   GET /api/tasks/planner/today
 exports.getDailyPlanner = async (req, res) => {
     try {
 
-        await handleTaskRollover(req.user.id);
+        await rolloverIncompleteItems(req.user.id);
 
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
@@ -165,14 +137,33 @@ exports.getDailyPlanner = async (req, res) => {
 
         const tasks = await Task.find({
             userId: req.user.id,
-            scheduledDate: { $gte: startOfToday, $lte: endOfToday },
-        }).sort({ scheduledDate: -1 });
+            scheduledDate: { $gte: startOfToday, $lte: endOfToday }
+        });
+
+        const tasksWithSubtasks = await Task.find({
+            userId: req.user.id,
+            "subtasks.scheduledDate": { $gte: startOfToday, $lte: endOfToday }
+        });
+
+        // FLatten subtasks for the frontend planner view
+        let scheduledSubtasks = [];
+        tasksWithSubtasks.forEach(t => {
+            const filtered = t.subtasks.filter(st => 
+                st.scheduledDate >= startOfToday && st.scheduledDate <= endOfToday
+            );
+            scheduledSubTasks.push(...filtered.map(st => ({
+                ...st.toObject(),
+                parentTaskId: t._id,
+                parentTitle: t.title
+            })));
+        });
 
         res.json({
             success: true,
-            rolloverActive: req.user.settings.autoRollover,
-            count: tasks.length,
-            tasks
+            plannerItems: {
+                tasks,
+                subtasks: scheduledSubtasks
+            }
         });
         
     } catch (error) {
@@ -185,20 +176,40 @@ exports.getDailyPlanner = async (req, res) => {
 exports.getTasksByDay = async (req, res) => {
 
     try {
-        const baseDate = new Date(req.params.date);
-
-        const start = new Date(baseDate);
+        const { date } = req.query;
+        const start = new Date(date);
         start.setHours(0, 0, 0, 0);
-
-        const end = new Date(baseDate);
+        const end = new Date(date);
         end.setHours(23, 59, 59, 999);
 
+        // 1. Get Schduled Top-Level Tasks
         const tasks = await Task.find({
             userId: req.user.id,
-            scheduledDate: { $gte: start, $lte: end },
+            scheduledDate: { $gte: start, $lte: end }
         });
 
-        res.json({ success: true, tasks });
+        // 2. Get Tasks that contain schduled subtasks for this date
+        const tasksWithSubtasks = await Task.find({
+            userId: req.user.id,
+            "subtasks.scheduledDate": { $gte: start, $lte: end }
+        });
+
+        // FLatten subtasks for the frontend planner view
+        let scheduledSubtasks = [];
+        tasksWithSubtasks.forEach(t => {
+            const filtered = t.subtasks.filter(st => 
+                st.scheduledDate >= start && st.scheduledDate <= end
+            );
+            scheduledSubTasks.push(...filtered.map(st => ({ ...st.toObject(), parentTaskId: t._id, parentTitle: t.title })));
+        });
+
+        res.json({
+            success: true,
+            plannerItems: {
+                tasks,
+                subtasks: scheduledSubtasks
+            }
+        });
 
     }catch(error) {
         res.status(500).json({ success: false, message: error.message });
@@ -240,16 +251,12 @@ exports.updateTaskStatus = async (req, res) => {
 
         if(!task) return res.status(404).json({ success: false, message: "Task not found" });
 
-        // CRITICAL: Sync with Project Kanban
-        const project = await Project.findById(task.projectId);
-        
         if(task.projectId) {
             const project = await Project.findById(task.projectId);
 
             if (project) {
                 // 1. Remove from all existing columns
                 Object.keys(project.kanban).forEach(col => {
-                    // Ensure we only filter if the property is an array
                     if (Array.isArray(project.kanban[col])) {
                         project.kanban[col] = project.kanban[col].filter(id => id.toString() !== task._id.toString());
                     }
@@ -257,24 +264,21 @@ exports.updateTaskStatus = async (req, res) => {
             
                 // 2. Map Task status to Kanban column
                 let targetColumn; 
-            
                 switch(status) {
-                    case 'Completed': // No colon after 'case'
-                        targetColumn = 'done';
+                    case 'Completed': 
+                        targetColumn = 'done'; 
                         break;
                     case 'On-Going':
                         targetColumn = 'doing';
                         break;
                     case 'Shelved':
-                    case 'Not Started': // Added this to handle your model default
+                    case 'Not Started':
                         targetColumn = 'todo';
                         break;
                     default:
-                        // Use a return here to stop execution if the status is invalid
-                        return res.status(400).json({ success: false, message: "Status incorrectly formatted" });
+                        return res.status(400).json({ success: false, message: "Invalid Status" });
                 }
             
-                // 3. Push to the new column and save
                 project.kanban[targetColumn].push(task._id);
                 await project.save();
             }
