@@ -205,7 +205,7 @@ exports.getTasksByDay = async (req, res) => {
     }
 }
 
-// @desc    Schedule a task for a specific date
+// @desc    Schedule a task for a specific date 
 // @route   PUT /api/tasks/:id/schedule
 exports.scheduleTask = async (req, res) => {
     try {
