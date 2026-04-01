@@ -55,6 +55,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/groups', require('./routes/groupRoutes'));
+app.use('/api/sessions', require('./routes/sessionRoutes'));
 
 // Analytics & Alerts
 app.use('/api/stats', require('./routes/statsRoutes'));
