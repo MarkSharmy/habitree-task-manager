@@ -5,6 +5,7 @@ import roadmapReducer from './slices/roadmapSlice';
 
 export const store = configureStore({
     reducer: {
+        auth: authReducer,
         tasks: taskReducer,
         session: sessionReducer,
         roadmap: roadmapReducer,

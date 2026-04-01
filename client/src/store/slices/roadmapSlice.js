@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import API from '../../api/axiosInstance';
 
 export const fetchRoadmap = createAsyncThunk(
     'roadmap/fetch',
     async (id) => {
-        const response = await axios.get(`/api/roadmaps/${id}`);
+        const response = await API.get(`/api/roadmaps/${id}`);
         return response.data.roadmap;
     }
 );

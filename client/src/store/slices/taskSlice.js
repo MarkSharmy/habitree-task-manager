@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import API from '../../api/axiosInstance';
 
 //Fetch today's planner ( Backend triggers Rollover automatically)
 export const fetchDailyPlanner = createAsyncThunk(
@@ -7,7 +7,7 @@ export const fetchDailyPlanner = createAsyncThunk(
     async (date, { rejectWithValue }) => {
         try {
 
-            const response = await axios.get(`/api/tasks/planner/today`);
+            const response = await API.get(`/api/tasks/planner/today`);
             return response.data.plannerItems;
 
         } catch (err) {
@@ -25,9 +25,9 @@ export const updateItemStatus = createAsyncThunk(
             let response;
 
             if (parentTaskId) {
-                response = await axios.patch(`/api/tasks/${parentTaskId}/subtasks/${id}`);
+                response = await API.patch(`/api/tasks/${parentTaskId}/subtasks/${id}`);
             }else {
-                response = await axios.patch(`/api/tasks/${id}/status`, { status });
+                response = await API.patch(`/api/tasks/${id}/status`, { status });
             }
 
             return { data: response.data, iSubtask: !!parentTaskId, id };
