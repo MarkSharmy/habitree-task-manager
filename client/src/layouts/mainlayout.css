@@ -120,7 +120,7 @@
 }
 
 /* RESPONSIVENESS */
-@media (max-width: 64rem) { /* Tablet */
+@media (max-width: 62rem) { /* Tablet */
     :root { --sb-width: 5rem; }
     .nav-item { justify-content: center; padding: 1.5rem 0; }
     .nav-item span:not(.icon), .sidebar-header h2 { display: none; }

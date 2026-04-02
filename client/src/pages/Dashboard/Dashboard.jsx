@@ -4,6 +4,7 @@ import { fetchDailyPlanner } from '../../store/slices/taskSlice';
 import TaskItem from '../../components/Dashboard/TaskItem';
 import EfficiencyWidget from '../../components/Dashboard/EfficiencyWidget';
 import './dashboard.css';
+import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -15,56 +16,64 @@ const Dashboard = () => {
     }, [dispatch]);
 
     return (
-        <div className="dashboard-grid">
-            {/* Center Section: Planner */}
-            <section className="planner-section">
-                <div className="planner-header">
-                    <h2>Today's Tasks</h2>
-                    <div className="date-picker">
-                        <span>Wednesday, Apr 1st</span>
+
+        <div className="dashboard-container">
+            <div className="planner-header">
+                <h2>Today's Tasks</h2>
+                <div className="date-picker">
+                    <ChevronLeft size={20} strokeWidth={2} className="date-picker-icon"/>
+                    <Calendar size={16} strokeWidth={2}/>
+                    <span>Wednesday, Apr 1st</span>
+                    <ChevronRight size={20} strokeWidth={2} className="date-picker-icon"/>
+                </div>
+                <button className="quick-add-btn">+ Quick Add</button>
+            </div>
+            <div className="dashboard-grid">
+                
+                {/* Center Section: Planner */}
+                <section className="planner-section">
+                    <div className="planner-card">
+                        <div className="card-header">
+                            <div>
+                                <span className="icon"><Calendar size={16} strokeWidth={2}/></span> <span>Scheduler</span>
+                            </div>
+                            <button className="start-session-btn">Start Session</button>
+                        </div>
+                        <div className="task-list">
+                            {tasks.map(task => (
+                                <TaskItem key={task._id} item={task}/>
+                            ))}
+                            {subtasks.map(sub => (
+                                <TaskItem key={sub._id} item={sub} isSubtask={true}/>
+                            ))}
+                        </div>
                     </div>
-                    <button className="quick-add-btn">+ Quick Add</button>
-                </div>
+                </section>
 
-                <div className="planner-card">
-                    <div className="card-header">
-                        <span className="icon">📅</span> Scheduler
-                        <button className="start-session-btn">Start Session</button>
+                {/* Right Section: Stats */}
+                <aside className="stats-sidebar">
+                    <EfficiencyWidget score={0.69}/>
+
+                    <div className="stat-card">
+                        <h4>Todal Productivity Time</h4>
+                        <p className="big-stat">5h 30m</p>
+                        <small>Sums all completed sessions.</small>
                     </div>
-                    <div className="task-list">
-                        {tasks.map(task => (
-                            <TaskItem key={task._id} item={task}/>
-                        ))}
-                        {subtasks.map(sub => (
-                            <TaskItem key={sub._id} item={sub} isSubtask={true}/>
-                        ))}
+
+                    <div className="stat-card">
+                        <h4>Weekly Overview</h4>
+                        <div className="mini-chart-placeholder"></div>
                     </div>
-                </div>
-            </section>
 
-            {/* Right Section: Stats */}
-            <aside className="stats-sidebar">
-                <EfficiencyWidget score={0.69}/>
+                    <div className="stat-card">
+                        <h4>Recent Activity</h4>
+                        <ul className="activity-list">
+                            <li>Completed: Read Forex for Beginners Chapter 1</li>
+                        </ul>
+                    </div>
 
-                <div className="stat-card">
-                    <h4>Todal Productivity Time</h4>
-                    <p className="big-stat">5h 30m</p>
-                    <small>Sums all completed sessions.</small>
-                </div>
-
-                <div className="stat-card">
-                    <h4>Weekly Overview</h4>
-                    <div className="mini-chart-placeholder"></div>
-                </div>
-
-                <div className="stat-card">
-                    <h4>Recent Activity</h4>
-                    <ul className="activity-list">
-                        <li>Completed: Read Forex for Beginners Chapter 1</li>
-                    </ul>
-                </div>
-
-            </aside>
+                </aside>
+            </div>
         </div>
     );
 }
