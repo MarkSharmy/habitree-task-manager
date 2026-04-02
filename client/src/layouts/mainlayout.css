@@ -1,0 +1,132 @@
+:root {
+    --sb-width: 12.25rem;
+    --header-h: 4.375rem;
+    --bg-main: #f0f2f5;
+    --sidebar-bg: #ffffff;
+    --primary: #3498bd;
+    --text-muted: #636e72;
+}
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bg-main);
+}
+
+.app-sidebar {
+    width: var(--sb-width);
+    background-color: var(--sidebar-bg);
+    border-right: 0.0625rem solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+}
+
+.sidebar-header {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sidebar-footer {
+    padding: 1rem 0;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 1rem 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.25rem;
+    padding: 0.8rem 1.5rem;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.nav-item .icon {
+    font-size: 1.2rem;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: #3498db;
+    background: #f1f7ff;
+}
+
+.nav-item.active {
+    border-right: 0.25rem solid #3498bd;
+}
+
+.icon-btn {
+    padding: 0.75rem;
+    color: #636e73;
+    cursor: pointer;
+    position: relative;
+}
+
+.notification-bell .dot {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: #e74c3c;
+    border: 1px solid white;
+    border-radius: 50%;
+}
+
+.content-area {
+    margin-left: var(--sb-width);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.app-header {
+    height: var(--header-h);
+    background-color: white;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 0.0625rem solid #e0e0e0;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-text { display: flex; flex-direction: column; }
+.user-name { font-weight: 600; font-size: 0.9rem; }
+.user-rank { font-size: 0.75rem; color: var(--text-muted); }
+
+.page-container {
+    padding: 2rem;
+    flex: 1;
+}
+
+/* RESPONSIVENESS */
+@media (max-width: 64rem) { /* Tablet */
+    :root { --sb-width: 5rem; }
+    .nav-item { justify-content: center; padding: 1.5rem 0; }
+    .nav-item span:not(.icon), .sidebar-header h2 { display: none; }
+}
+
+@media (max-width: 48rem) { /* Mobile */
+    .app-sidebar { display: none; } /* Add a hamburger menu logic later */
+    .content-area { margin-left: 0; }
+}

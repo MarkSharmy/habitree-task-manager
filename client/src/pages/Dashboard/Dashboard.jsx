@@ -3,8 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchDailyPlanner } from '../../store/slices/taskSlice';
 import TaskItem from '../../components/Dashboard/TaskItem';
 import EfficiencyWidget from '../../components/Dashboard/EfficiencyWidget';
-import './Dashboard.css';
-import { div } from 'framer-motion/client';
+import './dashboard.css';
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -12,7 +11,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         const today = new Date().toISOString().split('T')[0];
-        dispatch(fetchDailyPlanner(today));
+        //dispatch(fetchDailyPlanner(today));
     }, [dispatch]);
 
     return (
@@ -42,6 +41,30 @@ const Dashboard = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Right Section: Stats */}
+            <aside className="stats-sidebar">
+                <EfficiencyWidget score={0.69}/>
+
+                <div className="stat-card">
+                    <h4>Todal Productivity Time</h4>
+                    <p className="big-stat">5h 30m</p>
+                    <small>Sums all completed sessions.</small>
+                </div>
+
+                <div className="stat-card">
+                    <h4>Weekly Overview</h4>
+                    <div className="mini-chart-placeholder"></div>
+                </div>
+
+                <div className="stat-card">
+                    <h4>Recent Activity</h4>
+                    <ul className="activity-list">
+                        <li>Completed: Read Forex for Beginners Chapter 1</li>
+                    </ul>
+                </div>
+
+            </aside>
         </div>
     );
 }

@@ -11,7 +11,7 @@ export const fetchRoadmap = createAsyncThunk(
 
 const roadmapSlice = createSlice({
     name: 'roadmap',
-    intialState: {
+    initialState: {
         activeRoadmap: null,
         nodes: [],
         edges: [],
