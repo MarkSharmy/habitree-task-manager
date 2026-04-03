@@ -1,8 +1,7 @@
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 20rem;
+    grid-template-columns: 2fr 15rem;
     gap: 1.5rem;
-    max-width: 85rem;
     margin: 0 auto;
 }
 
@@ -48,6 +47,7 @@
     border-radius: 0.5rem;
     border: 0.0625rem solid #e0e0e0;
     padding: 1.5rem;
+    max-width: rem;
     height: 100%;
 }
 
@@ -80,6 +80,7 @@
 .stats-sidebar {
     display: flex;
     flex-direction: column;
+    max-width: 15rem;
     gap: 1rem;
 }
 
@@ -88,6 +89,7 @@
     padding: 1.2rem;
     border-radius: 0.5rem;
     border: 0.0625rem solid #e0e0e0;
+    text-align: center;
 }
 
 .stats-card h4 {

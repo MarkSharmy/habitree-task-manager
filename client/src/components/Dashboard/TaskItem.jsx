@@ -1,19 +1,20 @@
+import { Code2, layers, BookOpen, PlayCircle, StickyNote, Clock } from 'lucide-react';
 import './taskitem.css';
 
 const TaskItem = ({ item, isSubtask }) => {
     
-    const catergoryColors = {
-        PRACTICE: '#6c5ce7',
-        PROJECT: '#2ecc71',
-        READ: '#2d3436',
-        WATCH: '#e84393',
-        NOTE: '#f39c12',
+    const categoryConfig = {
+        PRACTICE: { color: '#6c5ce7', icon: <Code2 size={18} /> },
+        PROJECT: { color: '#2ecc71', icon: <Layers size={18} /> },
+        READ: { color: '#191b81', icon: <BookOpen size={18} /> },
+        WATCH: { color: '#e84393', icon: <PlayCircle size={18} /> },
+        NOTE: { color: '#f39c12', icon: <StickyNote size={18} /> }
     };
 
     return (
         <div className={`task-row ${isSubtask ? 'subtask-indent' : ''}`}>
-            <div className="task-icon" style={{ backgroundColor: categoryColors[item.category]}}>
-                {/* Logic for icons goes here */}
+            <div className="task-icon" style={{ backgroundColor: categoryConfig[item.category].color}}>
+                {categoryConfig[item,catergory].icon}
             </div>
             <div className="task-info">
                 <p className="task-title">{item.title}</p>
