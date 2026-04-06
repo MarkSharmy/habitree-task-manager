@@ -11,14 +11,14 @@ const sessionSchema = new mongoose.Schema({
         required: true
     },
     endTime: {
-        type: date
+        type: Date,
     },
     durationMinutes: {
         type: Number,
         default: 0
     },
     status: {
-        type: String.
+        type: String,
         enum: ["In Progress", "Completed", "Shelved"],
         required: true
     },

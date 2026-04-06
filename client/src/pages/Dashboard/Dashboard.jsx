@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchDailyPlanner } from '../../store/slices/taskSlice';
-import TaskItem from '../../components/Dashboard/TaskItem';
-import EfficiencyWidget from '../../components/Dashboard/EfficiencyWidget';
+import TaskItem from '../../components/dashboard/TaskItem';
+import EfficiencyWidget from '../../components/dashboard/EfficiencyWidget';
 import './dashboard.css';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 

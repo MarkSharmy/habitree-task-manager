@@ -45,7 +45,7 @@ exports.updateSubtask = async (req, res) => {
 
         if (updates.status === 'Completed') {
             await Task.updateOne(
-                { _idL taskId, "subtasks.id": subtaskId },
+                { _id: taskId, "subtasks.id": subtaskId },
                 { $set: { "subtasks.$.isCompleted": true } }
             );
         }

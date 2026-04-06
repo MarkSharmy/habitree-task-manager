@@ -13,11 +13,11 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['INVITE', 'TASK_ASSIGNED', 'SYSTEM_ALERT'].
+        enum: ['INVITE', 'TASK_ASSIGNED', 'SYSTEM_ALERT'],
         default: 'INVITE'
     },
     message: { type: String, required: true },
-    projectId: { type.mongoose.Schema.Types.ObjectId, ref: 'project' },
+    projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'project' },
     isRead: { type: Boolean, default: false }
 }, {
     timestamps: true

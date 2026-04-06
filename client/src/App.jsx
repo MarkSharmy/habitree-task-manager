@@ -2,7 +2,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import MainLayout from './layouts/MainLayout';
 import Landing from './pages/Landing/Landing';
 import Dashboard from './pages/Dashboard/Dashboard';
+import LoginPage from './pages/Auth/LoginPage';
+
 import NotFound from './pages/NotFound/NotFound';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+
 
 function App() {
 
@@ -11,9 +15,10 @@ function App() {
       <Routes>
         {/* --- Public Routes --- */}
         <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<LoginPage />} />
 
         {/* --- Private Routes --- */}
-        <Route element={ <MainLayout />}>
+        <Route element={ <ProtectedRoute><MainLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
             {/* <Route path="/tasks" element={<TaskList />} /> */}
           </Route>

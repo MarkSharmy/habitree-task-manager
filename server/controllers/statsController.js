@@ -142,7 +142,7 @@ exports.getTaskVolumeStats = async (req, res) => {
             totalTasks,
             completedTasks,
             completionRate: totalTasks > 0 
-                ? `${((completedTasks / totalTasks) * 100).toFixed(1)}%`,
+                ? `${((completedTasks / totalTasks) * 100).toFixed(1)}%`
                 : "0%"
         });
         

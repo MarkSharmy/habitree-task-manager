@@ -234,7 +234,7 @@ exports.inviteCollaborator = async (req, res) => {
         await project.save();
 
         // 5. Notify the recipient via Email
-        const notification = awit Notification.create({
+        const notification = await Notification.create({
             recipient: recipient._id,
             sender: req.user.id,
             type: 'INVITE',
@@ -246,7 +246,7 @@ exports.inviteCollaborator = async (req, res) => {
         req.io.to(recipient._id.toString()).emit('newNotification', notification);
 
         // 7. Send Email (Offline)
-        await sendEmail({ email: recipient.email, ... });
+        //await sendEmail({email: recipient.email, ...});
 
         res.json({ success: true, message: "Collaborator invited successfully" });
 

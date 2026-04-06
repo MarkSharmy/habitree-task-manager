@@ -1,4 +1,4 @@
-import { Code2, layers, BookOpen, PlayCircle, StickyNote, Clock } from 'lucide-react';
+import { Code2, Layers, BookOpen, PlayCircle, StickyNote, Clock } from 'lucide-react';
 import './taskitem.css';
 
 const TaskItem = ({ item, isSubtask }) => {

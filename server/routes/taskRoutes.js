@@ -41,12 +41,12 @@ router.patch('/:id/status', checkPrerequisites, taskController.updateTaskStatus)
  * @section Subtask Management
  */
 // Add a subtask to a parent task
-router.post('/:taskId/subtasks', subtaskController.addSubTask);
+router.post('/:taskId/subtasks', subtaskController.createSubtask);
 
 // Update a specific subtask (Schedule it, Rename it, or Complete it)
-router.patch('/:taskId/subtasks/:subTaskId', subtaskController.updateSubTask);
+router.patch('/:taskId/subtasks/:subTaskId', subtaskController.updateSubtask);
 
 // Remove a subtask
-router.delete('/:taskId/subtasks/:subTaskId', subtaskController.deleteSubTask);
+router.delete('/:taskId/subtasks/:subTaskId', subtaskController.deleteSubtask);
 
 module.exports = router;

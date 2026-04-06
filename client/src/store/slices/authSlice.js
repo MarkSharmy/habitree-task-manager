@@ -5,13 +5,13 @@ export const loginUser = createAsyncThunk(
     'auth/login',
     async (credentials, { rejectWithValue }) => {
         try {
-
+            console.log("Logging in user...");
             const response = await API.post('/auth/login', credentials);
             localStorage.setItem('habitree_token', response.data.token);
-            return res.data.user;
+            return response.data.user;
 
         } catch (err) {
-            return rejectWithValue(err.response.data);
+            return rejectWithValue(err.response?.data?.message || "Login failed");
         }
     }
 );
@@ -22,20 +22,31 @@ const authSlice = createSlice({
         user: null,
         isAuthenticated: !!localStorage.getItem('habitree_token'),
         loading: false,
+        error: null,
     },
     reducers: {
         logout: (state) => {
             localStorage.removeItem('habitree_token');
             state.user = null;
             state.isAuthenticated = false;
+            state.error = null;
         }
     },
     extraReducers: (builder) => {
         builder
+            .addCase(loginUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(loginUser.fulfilled, (state, action) => {
+                state.loading = false;
                 state.user = action.payload;
                 state.isAuthenticated = true;
-            });
+            })
+            .addCase(loginUser.rejected, (state) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
     }
 });
 

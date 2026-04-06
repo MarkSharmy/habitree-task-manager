@@ -1,0 +1,249 @@
+.landing-container {
+    color: #2d3436;
+    line-height: 1.6;
+}
+
+/* Global */
+.section-title {
+    color: #2d2d2d;
+    text-align: center;
+    font-size: 1.5rem;
+    text-decoration: underline;
+    margin: 2rem auto;
+}
+
+/* Navigation */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 5rem;
+}
+
+.landing-nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    position: sticky;
+    padding: 0.5% 0;
+    top: 0;
+    z-index: 100;
+    border-bottom: 0.0625rem solid #eee;
+}
+
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-auth {
+    padding: 2rem 2.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    height: 100%;
+}
+
+.btn-login{
+    background: none;
+    color: #25619f;
+    text-decoration: none;
+    margin-left: 1rem;
+}
+
+.btn-login:hover {
+    color: #285786;
+    border: 0.0625rem solid;
+    transition: 0.2s ease;
+
+}
+
+.btn-register {
+    background-color: #25619f;
+    color: white;
+    
+}
+
+.btn-register:hover {
+    background-color: #285786;
+    transition: 0.2s ease;
+}
+
+.landing-nav .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #2d3436;
+}
+
+.nav-links a:hover {
+    color: #285786;
+    transition: 0.2s ease;
+}
+
+/* Hero Section */
+
+.hero-section {
+    text-align: center;
+    padding: 1rem;
+    background: #fafafa;
+    margin-top: 2rem;
+}
+
+.hero-section h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.hero-visual {
+    margin: 1rem auto;
+    max-width: 60rem;
+    height: 25rem;
+    background: #fff;
+}
+
+.hero-img {
+    max-width: 60rem;
+}
+
+.hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.action-btn {
+    color: white;
+    font-weight: 700;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.btn-green {
+    background-color: #37975a;
+}
+
+.btn-green:hover {
+    background-color: #338551;
+    transition: 0.2s ease;
+}
+
+.btn-blue {
+    background-color: #25619f;
+}
+
+.btn-blue:hover {
+    background-color: #285786;
+    transition: 0.2s ease;
+}
+
+/* Features Grid */
+.features-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem 5%;
+    flex-wrap: wrap;
+}
+
+.feature-card {
+    flex: 1;
+    min-width: 8rem;
+    max-width: 12rem;
+    padding: 2.5rem 1.5rem;
+    border: 0.0625rem solid #e0e0e0;
+    border-radius: 0.75rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.feature-icon {
+    height: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Preview Section */
+.preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.3));
+    margin-top: 2rem;
+}
+
+.dashboard-preview {
+    width: 40rem;
+    border-radius: 2rem;
+    overflow: hidden;
+}
+
+.dashboard-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    margin: 1rem auto;
+}
+
+/* Tech Section */
+.tech-stack {
+    padding: 4rem 10%;
+    text-align: center;
+    background: white;
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 1rem;
+}
+
+.tech-item-img {
+    object-fit: fill;
+    height: 10rem;
+}
+
+/* Footer  */
+footer {
+    color: #2d3436;
+    background-color: #eee;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+footer .copyright, .author {
+    text-align: center;
+    font-size: small;
+    font-weight: 400;
+}
+
+
+
+/* Responsive */
+@media (max-width: 48rem) {
+    .hero-section h1 {
+        font-size: 1.75rem;
+    }
+    .hero-visual {
+        height: 15rem;
+    }
+    .feature-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+

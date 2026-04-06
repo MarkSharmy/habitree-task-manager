@@ -10,7 +10,7 @@ const isTaskLocked = async (taskId) => {
     const roadmap = await Roadmap.findOne({ "node.id": taskId.toString() });
 
     //If no roadmap exists or the task isn't in one, it's not locked by dependencies
-    if (!roadmap) = return false;
+    if (!roadmap) return false;
 
     // 2. Identify all 'source' IDs where THIS task is the 'target'
     const prerequisites = roadmap.edges
