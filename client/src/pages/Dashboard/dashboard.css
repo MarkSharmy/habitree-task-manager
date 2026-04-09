@@ -85,11 +85,12 @@
 }
 
 .stat-card {
+    padding: 0.875rem;
+    text-align: center;
     background-color: #fff;
-    padding: 1.2rem;
     border-radius: 0.5rem;
     border: 0.0625rem solid #e0e0e0;
-    text-align: center;
+    box-shadow: 0.01rem 0.1rem 0.25rem rgba(0, 0, 0, 0.1);
 }
 
 .stats-card h4 {

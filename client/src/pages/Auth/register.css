@@ -1,0 +1,254 @@
+.register-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 30rem;
+    height: auto;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1.25rem 3.125rem rgba(0, 0, 0, 0.1);
+}
+
+.auth-banner {
+    height: 12.5rem;
+    background: linear-gradient(135deg, #448aff 0%, #0055ff 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    overflow: hidden;
+}
+
+.banner-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.banner-subtitle {
+    font-size: 0.875rem;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05rem;
+}
+
+.banner-title {
+    font-size: 2.2rem;
+    font-weight: 400;
+    letter-spacing: 0.1rem;
+    margin: 0;
+}
+
+.banner-underline {
+    width: 2rem;
+    height: 0.25rem;
+    background: white;
+    margin: 1rem auto 0;
+    border-radius: 0.125rem;
+}
+
+/* FORM AREA */
+
+.register-card .auth-form-container {
+    padding: 3.5rem 2.5rem 2.5rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-form-container .register-form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.register-form .input-group {
+    position: relative;
+}
+
+.register-form .input-group::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0.1875rem;
+    background-color: #448aff;
+}
+
+.register-form input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background-color: #f7f9fb;
+    border: none;
+    outline: none;
+    color: #2d3436;
+    font-size: 0.9rem;
+}
+
+
+.auth-submit-btn {
+    margin: 2rem auto 0 auto;
+    padding: 1rem 0.5rem;
+    width: 10rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 2rem;
+    font-weight: 500;
+    letter-spacing: 0.05rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.auth-submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.auth-submit-btn::disabled {
+    background-color: #a0c4ff;
+    cursor: not-allowed;
+}
+
+.register-card .form-footer {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+}
+
+.back-home-link {
+    color: #448aff;
+    text-decoration: underline;
+    font-size: 0.9rem;
+}
+
+.auth-switch-prompt {
+    color: #a0a0a0;
+    font-size: 0.9rem;
+}
+
+.auth-switch-link {
+    color: #448aff;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.auth-error-msg {
+    background-color: #ffeef0;
+    color: #d63031;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    text-align: center;
+    border: 0.0625rem solid #fab1a0;
+    margin-bottom: 0.5rem;
+}
+
+/* RESPONSIVENESS */
+@media (max-width: 48rem) {
+    .auth-page {
+        padding: 1.5rem;
+    }
+
+    .register-card {
+        max-width: auto;
+        border-radius: 0.75rem;
+    }
+
+    .auth-banner {
+        height: 10rem;
+    }
+
+    .banner-title {
+        font-size: 1.75rem;
+    }
+
+    .auth-form-container {
+        padding: 1rem;
+    }
+
+    .register-card .auth-form-container {
+        justify-content: center;
+        padding: 2rem 1.5rem;
+    }
+
+    .auth-form-container .register-form {
+        justify-content: center;
+        width: 90%;
+        gap: 1.5rem;
+    }
+
+    .register-card .form-footer {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .auth-submit-btn {
+        width: 100%;
+        font-size: 1rem;
+    }
+}
+
+@media (min-width: 50rem) and (max-width: 63rem) {
+    .auth-page {
+        padding: 0;
+    }
+
+    .register-card {
+        height: 80vh;
+        max-width: 80vw;
+        border-radius: 0.75rem;
+    }
+
+    .auth-banner {
+        height: 10rem;
+    }
+
+    .banner-title {
+        font-size: 1.75rem;
+    }
+
+    .auth-form-container {
+        padding: 1rem;
+    }
+
+    .register-card .auth-form-container {
+        justify-content: center;
+        padding: 2rem 1.5rem;
+    }
+
+    .auth-form-container .register-form {
+        justify-content: center;
+        width: 90%;
+        gap: 3rem;
+    }
+
+    .register-form .input-group {
+        height: 4rem;
+    }
+
+    .register-form input {
+        height: 100%;
+    }
+
+    .register-form input:focus {
+    }
+
+    .register-card .form-footer {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .auth-submit-btn {
+        width: 100%;
+        font-size: 1rem;
+    }
+}
+
+
+
+

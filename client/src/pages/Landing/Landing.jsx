@@ -30,13 +30,13 @@ const Landing = () => {
                 </div>
                 <div className="auth-buttons">
                     <Link to="/login"className="btn-auth btn-login">Log In</Link>
-                    <button className="btn-auth btn-register">Get Started</button>
+                    <Link to="/register" className="btn-auth btn-register">Get Started</Link>
                 </div>
             </nav>
 
             {/* Hero Section */}
             <header className="hero-section">
-                <h1>Habitree: Your Unified Productivity Manager</h1>
+                <h1>Habitree: Your WUnified Productivity Manager</h1>
                 <p>Master skills, track learning, and visualize your<br/>progress with MERN-stack power.</p>
                 <div className="hero-visual">
                     <div className="roadmap-preview-img"><img src={Hero} alt="Hero" className="hero-img"/></div>

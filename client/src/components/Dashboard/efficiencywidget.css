@@ -1,0 +1,58 @@
+.efficiency-card {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 0.0625rem solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-title-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.card-title-row h4 {
+    font-size: 0.875rem;
+    color: #2d3436;
+    margin: 0;
+}
+
+.info-icon {
+    color: #b2bec3;
+    cursor: pointer;
+}
+
+.progress-container {
+    padding: 1rem 0;
+}
+
+.circular-progress {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background 0.5s ease;
+}
+
+.inner-circle {
+    width: 4rem;
+    height: 4rem;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-number {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #2d3436;
+}

@@ -1,14 +1,32 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchDailyPlanner } from '../../store/slices/taskSlice';
 import TaskItem from '../../components/dashboard/TaskItem';
 import EfficiencyWidget from '../../components/dashboard/EfficiencyWidget';
 import './dashboard.css';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import SessionSettings from '../../components/dashboard/session/SessionSettings';
 
 const Dashboard = () => {
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [activeSession, setActiveSession] = useState(null);
+
     const dispatch = useDispatch();
     const { tasks, subtasks } = useSelector((state) => state.tasks.planner );
+
+    const calculateEfficiency = (sessions) => {
+
+    }
+
+    const handleStartSession = (totalSeconds) => {
+        setActiveSession({
+            startTime: Date.now(),
+            duration: totalSeconds,
+            remaining: totalSeconds
+        });
+
+        setModalOpen(false);
+    }
 
     useEffect(() => {
         const today = new Date().toISOString().split('T')[0];
@@ -37,7 +55,7 @@ const Dashboard = () => {
                             <div>
                                 <span className="icon"><Calendar size={16} strokeWidth={2}/></span> <span>Scheduler</span>
                             </div>
-                            <button className="start-session-btn">Start Session</button>
+                            <button className="start-session-btn" onClick={() => setModalOpen(true)}>Start Session</button>
                         </div>
                         <div className="task-list">
                             {tasks.map(task => (
@@ -71,8 +89,12 @@ const Dashboard = () => {
                             <li>Completed: Read Forex for Beginners Chapter 1</li>
                         </ul>
                     </div>
-
                 </aside>
+                <SessionSettings
+                    isOpen={isModalOpen}
+                    onClose={() => setModalOpen(false)}
+                    onStart={handleStartSession}
+                />
             </div>
         </div>
     );
