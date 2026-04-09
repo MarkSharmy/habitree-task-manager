@@ -71,15 +71,15 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
                 </div>
 
                 <footer className="modal-footer">
+                    <div className="footer-actions">
+                        <button className="btn-start" onClick={() => {}}>
+                            <Play size={20} strokeWidth={2} fill="currentColor" /> Start Session
+                        </button>
+                        <button className="btn-cancel" onClick={onClose}>Cancel</button>
+                    </div>
                     <div className="footer info">
                         <Info size={20} strokeWidth={2} />
                         <p>Timer countdown will begin upon 'Start Session'</p>
-                    </div>
-                    <div className="footer-actions">
-                        <button className="start-btn" onClick={() => {}}>
-                            <Play size={20} strokeWidth={2} fill="currentColor" /> Start Session
-                        </button>
-                        <button className="btn=cancel" onClick={onClose}>Cancel</button>
                     </div>
                 </footer>
             </div>

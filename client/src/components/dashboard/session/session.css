@@ -1,7 +1,7 @@
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rbga(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -11,7 +11,7 @@
 .session-modal {
     background: white;
     width: 100%;
-    max-width: 32rem;
+    max-width: 38rem;
     border-radius: 0.75rem;
     box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -20,15 +20,104 @@
 .modal-header {
     display: flex;
     justify-content: space-between;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 0.5rem 1rem;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.modal-body {
+    margin: 1rem 2rem;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
 }
 
 .main-timer-display {
-    font-size: 4rem;
-    font-weight: 600;
+    font-size: 3rem;
+    font-weight: 500;
     text-align: center;
     color: #2d3436;
     margin: 1.5rem 0;
 }
 
+.timer-controls-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.time-unit-box {
+    text-align: center;
+}
+
+.unit-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f8f9fa;
+    padding: 0.25rem;
+}
+
+.unit-value {
+    font-size: 1.25rem;
+    font-weight: 400;
+    min-width: 2rem;
+    border: 1.5px solid #aaaaaa;
+    border-radius: 50%;
+    padding: 0.75rem;
+}
+
+.unit-label {
+    color: #222;
+    font-size: 0.75rem;
+}
+
+.unit-controls button {
+    background: white;
+    width: 1.75rem;
+    height: 1.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #aaaaaa;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.qt-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.qt-btn.active {
+    background-color: #e7f1ff;
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.btn-start {
+    background: #2d6a4f;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: #f1f3f5;
+    color: #495057;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
