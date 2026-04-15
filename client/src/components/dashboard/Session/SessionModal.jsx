@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Play, Pause, Plus, Minus, RotateCcw, Square, Info } from 'lucide-react';
-import './session.css';
+import './sessionCommon.css';
 
 import Logo from '../../../assets/logo.png';
 

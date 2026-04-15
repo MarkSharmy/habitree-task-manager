@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Play, Info, Minus, Plus} from 'lucide-react';
-import './session.css';
+import './sessionCommon.css';
 
 import Logo from '../../../assets/logo.png';
 
