@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
-import SessionSettings from '../../components/dashboard/session/SessionSettings';
-import SessionModal from '../../components/dashboard/Session/SessionModal';
+import SessionSettings from '../../components/modals/Session/SessionSettings';
+import SessionModal from '../../components/modals/Session/SessionModal';
 import TaskItem from '../../components/dashboard/TaskItem/TaskItem';
 import EfficiencyWidget from '../../components/dashboard/EfficiencyWidget/EfficiencyWidget';
 
