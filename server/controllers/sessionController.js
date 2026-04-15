@@ -1,41 +1,31 @@
 const Session = require('../models/session');
 const Task = require('../models/task');
 
-// @desc    Start a work session
-exports.startSession = async (req, res) => {
-    try {
-        const session = await Session.create({
+// @desc    Create a new completed session (sent from Web/Mobile)
+// @route   POST /api/sessions/save
+exports.saveSession= async (req, res) => {
+    try{
+        const { startTime, endTime, durationMinutes } = req.body;
+
+        const newSession = await Session.create({
             userId: req.user.id,
-            startTime: new Date(),
-            status: 'In Progress'
+            startTime,
+            endTime,
+            durationMinutes,
+            status: 'Completed'
         });
+
+        if (req.io) {
+            req.io.to(req.user.id).emit('statsUpdated');
+        }
+
+        res.status(201).json({ success: true, session: newSession });
         
-        res.status(201).json({ success: true, session });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+    }catch(error) {
+        res.status(500).json({ success: false, message: error.message});
     }
 }
 
-// @desc    Stop a work session and update task total time
-exports.stopSession = async (req, res) => {
-    try {
-        const { durationMinutes } = req.body; // calculated by frontend timer
-        const session = await Session.findOneAndUpdate(
-            { _id: req.params.id, userId: req.user.id },
-            {
-                endTime: new Date(),
-                durationMinutes,
-                status: 'Completed'
-            },
-            { new: true }
-        );
-
-        res.json({ success: true, session });
-        
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
 
 // @desc    Sync offline sessions from mobile
 // @route   POST /api/sessions/sync

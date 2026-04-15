@@ -10,10 +10,24 @@ import React from '../../assets/react.png';
 import Redux from '../../assets/redux.png';
 import Node from '../../assets/node.png';
 
+import { useEffect }  from 'react';
+import { useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import './landing.css';
-import { Link } from 'react-router-dom';
 
 const Landing = () => {
+
+    const navigate = useNavigate();
+
+    const { isAuthenticated } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            console.log("Redirecting to Dashboard");
+            navigate('/dashboard')
+        }
+    }, [isAuthenticated, navigate]);
+
     return (
         <div id="home" className="landing-container">
             {/* Navigation */}
@@ -36,7 +50,7 @@ const Landing = () => {
 
             {/* Hero Section */}
             <header className="hero-section">
-                <h1>Habitree: Your WUnified Productivity Manager</h1>
+                <h1>Habitree: Your Unified Productivity Manager</h1>
                 <p>Master skills, track learning, and visualize your<br/>progress with MERN-stack power.</p>
                 <div className="hero-visual">
                     <div className="roadmap-preview-img"><img src={Hero} alt="Hero" className="hero-img"/></div>

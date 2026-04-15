@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
-const { startSession, stopSession } = require('../controllers/sessionController');
+const { saveSession } = require('../controllers/sessionController');
 
 router.use(protect);
 
-router.post('/start', startSession);
-router.put('/stop/:id', stopSession);
+router.post('/save', saveSession);
 
 module.exports = router;

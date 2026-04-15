@@ -1,36 +1,47 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchDailyPlanner } from '../../store/slices/taskSlice';
-import TaskItem from '../../components/dashboard/TaskItem';
-import EfficiencyWidget from '../../components/dashboard/EfficiencyWidget';
-import './dashboard.css';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+
 import SessionSettings from '../../components/dashboard/session/SessionSettings';
+import SessionModal from '../../components/dashboard/Session/SessionModal';
+import TaskItem from '../../components/dashboard/TaskItem/TaskItem';
+import EfficiencyWidget from '../../components/dashboard/EfficiencyWidget/EfficiencyWidget';
+
+import { fetchTodayStats } from '../../store/slices/statsSlice';
+import { saveWorkSession } from '../../store/slices/sessionSlice';
+
+import './dashboard.css';
 
 const Dashboard = () => {
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [activeSession, setActiveSession] = useState(null);
-
     const dispatch = useDispatch();
+    
     const { tasks, subtasks } = useSelector((state) => state.tasks.planner );
+    const { efficiencyScore, totalProductivityMinutes } = useSelector((state) => state.stats);
 
-    const calculateEfficiency = (sessions) => {
+    const [isSettingsOpen, setSettingsOpen] = useState(false);
+    const [isActiveModalOpen, setActiveModalOpen] = useState(false);
+    const [sessionTime, setSessionTime] = useState(0);
 
+    const formatMinutes = (mins) => {
+        if (!mins) mins = 0;
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return `${h}h ${m}m`
     }
 
     const handleStartSession = (totalSeconds) => {
-        setActiveSession({
-            startTime: Date.now(),
-            duration: totalSeconds,
-            remaining: totalSeconds
-        });
-
-        setModalOpen(false);
+        setSessionTime(totalSeconds);
+        setSettingsOpen(false);
+        setActiveModalOpen(true);
     }
 
+    const handleSessionFinish = (sessionData) => {
+        dispatch(saveWorkSession(sessionData));
+        setActiveModalOpen(false);
+    };
+
     useEffect(() => {
-        const today = new Date().toISOString().split('T')[0];
-        //dispatch(fetchDailyPlanner(today));
+        dispatch(fetchTodayStats());
     }, [dispatch]);
 
     return (
@@ -55,7 +66,7 @@ const Dashboard = () => {
                             <div>
                                 <span className="icon"><Calendar size={16} strokeWidth={2}/></span> <span>Scheduler</span>
                             </div>
-                            <button className="start-session-btn" onClick={() => setModalOpen(true)}>Start Session</button>
+                            <button className="start-session-btn" onClick={() => setSettingsOpen(true)}>Start Session</button>
                         </div>
                         <div className="task-list">
                             {tasks.map(task => (
@@ -70,11 +81,11 @@ const Dashboard = () => {
 
                 {/* Right Section: Stats */}
                 <aside className="stats-sidebar">
-                    <EfficiencyWidget score={0.69}/>
+                    <EfficiencyWidget score={efficiencyScore}/>
 
                     <div className="stat-card">
                         <h4>Todal Productivity Time</h4>
-                        <p className="big-stat">5h 30m</p>
+                        <p className="big-stat">{formatMinutes(totalProductivityMinutes)}</p>
                         <small>Sums all completed sessions.</small>
                     </div>
 
@@ -90,12 +101,20 @@ const Dashboard = () => {
                         </ul>
                     </div>
                 </aside>
-                <SessionSettings
-                    isOpen={isModalOpen}
-                    onClose={() => setModalOpen(false)}
-                    onStart={handleStartSession}
-                />
             </div>
+
+            <SessionSettings
+                isOpen={isSettingsOpen}
+                onClose={() => setSettingsOpen(false)}
+                onStart={handleStartSession}
+            />
+
+            <SessionModal
+                isOpen={isActiveModalOpen}
+                initialSeconds={sessionTime}
+                onFinish={handleSessionFinish}
+                onClose={() => setActiveModalOpen(false)}
+            />
         </div>
     );
 }

@@ -6,7 +6,7 @@ import Logo from '../../../assets/logo.png';
 
 const SessionSettings = ({ isOpen, onClose, onStart }) => {
     const [hours, setHours] = useState(0);
-    const [minutes, setMinutes] = useState(0);
+    const [minutes, setMinutes] = useState(20);
     const [seconds, setSeconds] = useState(0);
 
     //Calculate total seconds for the slider logic
@@ -45,9 +45,9 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
                     </div>
 
                     <div className="timer-controls-grid">
-                        <TimeUnit label="Hours" value={hours} onAdj={(amt) => adjustUnit('h', amount)} />
-                        <TimeUnit label="Minutes" value={minutes} onAdj={(amt) => adjustUnit('m', amount)} />
-                        <TimeUnit label="Seconds" value={seconds} onAdj={(amt) => adjustUnit('s', amount)} />
+                        <TimeUnit label="Hours" value={hours} onAdj={(amount) => adjustUnit('h', amount)} />
+                        <TimeUnit label="Minutes" value={minutes} onAdj={(amount) => adjustUnit('m', amount)} />
+                        <TimeUnit label="Seconds" value={seconds} onAdj={(amount) => adjustUnit('s', amount)} />
                     </div>
 
                     <div className="slider-containe">
@@ -72,7 +72,7 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
 
                 <footer className="modal-footer">
                     <div className="footer-actions">
-                        <button className="btn-start" onClick={() => {}}>
+                        <button className="btn-start" onClick={() => onStart(totalSeconds)}>
                             <Play size={20} strokeWidth={2} fill="currentColor" /> Start Session
                         </button>
                         <button className="btn-cancel" onClick={onClose}>Cancel</button>

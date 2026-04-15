@@ -1,14 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import taskReducer from './slices/taskSlice';
-import sessionReducer from './slices/sessionSlice';
 import roadmapReducer from './slices/roadmapSlice';
+import statsReducer from './slices/statsSlice';
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
         tasks: taskReducer,
-        session: sessionReducer,
+        stats: statsReducer,
         roadmap: roadmapReducer,
     },
     //Add middleware here...

@@ -17,21 +17,17 @@ exports.getTodayOverview = async (req, res) => {
         });
 
         const totalMinutesToday = sessions.reduce((acc, sess) => acc + (sess.durationMinutes || 0), 0);
-        const totalHoursToday = parseFloat((totalMinutesToday /60).toFixed(2));
 
         const EIGHT_HOURS_IN_MINUTES = 8 * 60;
 
         // Calculate Efficiency score (Productive Hours / 8)
-        const dailyEfficiencyScore = Math.round( (totalMinutesToday / EIGHT_HOURS_IN_MINUTES) * 100 );
+        const dailyEfficiencyScore = Math.round((totalMinutesToday / EIGHT_HOURS_IN_MINUTES) * 100) / 100;
 
         res.json({
             success: true,
             date: startofToday.toISOString().split('T')[0],
-            metrics: {
-                totalMinutes: totalMinutesToday,
-                totalHours: totalHoursToday,
-                efficiencyScore: `${dailyEfficiencyScore}`,
-            },
+            totalMinutes: totalMinutesToday,
+            efficiencyScore: dailyEfficiencyScore,
             sessionsCount: sessions.length
         });
         
