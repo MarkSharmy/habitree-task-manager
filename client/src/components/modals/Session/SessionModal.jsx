@@ -10,13 +10,14 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
     const [isActive, setActive] = useState(true);
     const [extraMins, setExtraMins] = useState(5);
 
-    //Audio ref for the bell
+    const endTimeRef = useRef(null);
     const bellRef = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'));
-
+    
     useEffect(() => {
         if (isOpen) {
+            endTimeRef.current = Date.now() + (initialSeconds * 1000);
             setSeconds(initialSeconds);
-            setActive(true);
+            setActive(true)
 
             //Request nofication permission when modal opens
             if (Notification.permission === "default") {
@@ -28,20 +29,41 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
     //Countdown logic
     useEffect(() => {
         let interval = null;
-        
-        if(isActive && secondsLeft > 0) {
+
+        if (isActive && secondsLeft > 0) {
             interval = setInterval(() => {
-                setSeconds((prev) => prev - 1);
-            }, 1000);
-        }
-        else if (secondsLeft === 0) {
-            handleTimerComplete();
-            clearInterval(interval);
+                // Calculate actual difference between 'now' and 'target'
+                const now = Date.now();
+                const remaining = Math.max(0, Math.ceil((endTimeRef.current - now) / 1000));
+                
+                setSeconds(remaining);
+
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    handleTimerComplete();
+                }
+            }, 500); // Check every 500ms for smoothness, but logic is time-based
         }
 
         return () => clearInterval(interval);
+    }, [isActive]);
 
-    }, [isActive, secondsLeft]);
+    // When user pauses, we need to handle the "End Time" shift
+    const togglePause = () => {
+        if (isActive) {
+            // Pausing: Just stop the interval
+            setActive(false);
+        } else {
+            // Resuming: Recalculate the new target end time based on seconds left
+            endTimeRef.current = Date.now() + (secondsLeft * 1000);
+            setActive(true);
+        }
+    };
+
+    const handleReset = () => {
+        endTimeRef.current = Date.now() + (initialSeconds * 1000);
+        setSeconds(initialSeconds);
+    };
 
     const handleTimerComplete = () => {
         //Only play is the session modal is open
@@ -131,13 +153,13 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
                     </div>
 
                     <div className="session-actions">
-                        <button className="action-btn btn-resume" onClick={() => setActive(true)} disabled={isActive}>
+                        <button className="action-btn btn-resume" onClick={togglePause} disabled={isActive}>
                             <Play size={18} fill="currentColor" /> Start
                         </button>
-                        <button className="action-btn btn-pause" onClick={() => setActive(false)} disabled={!isActive}>
+                        <button className="action-btn btn-pause" onClick={togglePause} disabled={!isActive}>
                             <Pause size={18} fill="currentColor" /> Pause
                         </button>
-                        <button className="action-btn btn-reset" onClick={() => setSeconds(initialSeconds)}>
+                        <button className="action-btn btn-reset" onClick={handleReset}>
                             <RotateCcw size={18}/> Reset
                         </button>
                         <button className="action-btn btn-stop" onClick={handleStopSession}>

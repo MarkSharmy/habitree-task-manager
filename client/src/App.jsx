@@ -4,6 +4,7 @@ import Landing from './pages/Landing/Landing';
 import Dashboard from './pages/Dashboard/Dashboard';
 import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage';
+import TaskList from './pages/TaskList/TaskList';
 
 import NotFound from './pages/NotFound/NotFound';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -22,8 +23,8 @@ function App() {
         {/* --- Private Routes --- */}
         <Route element={ <ProtectedRoute><MainLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
-            {/* <Route path="/tasks" element={<TaskList />} /> */}
-          </Route>
+          <Route path="/tasks" element={<TaskList />} />
+        </Route>
 
         {/* Redirect unknown routes */}
         <Route path="*" element={<NotFound />} />
