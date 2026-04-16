@@ -46,7 +46,7 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
         }
 
         return () => clearInterval(interval);
-    }, [isActive]);
+    }, [isActive, secondsLeft]);
 
     // When user pauses, we need to handle the "End Time" shift
     const togglePause = () => {
@@ -93,7 +93,10 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
     }
 
     const handleAddTime = () => {
-        setSeconds(prev => prev + (extraMins * 60));
+        const addedSeconds = extraMins * 60;
+
+        endTimeRef.current += (addedSeconds * 1000);
+        setSeconds(prev => prev + addedSeconds);
         setActive(true);
     }
 
