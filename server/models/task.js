@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const SubtaskSchema = new mongoose.Schema({
     title: { type: String, required: true },
     isCompleted: { type: Boolean, default: false },
-    scheduledDate: { type: Date, default: null },
     status: {
         type: String,
         enum: ['Not Started', 'On-Going', 'Completed', 'Shelved'],
@@ -33,9 +32,6 @@ const TaskSchema = new mongoose.Schema({
     },
     subtasks: [SubtaskSchema],
 
-    //Daily Planner Integration
-    scheduledDate: { type: Date, default: null },
-    
 }, { timestamps: true });
 
 //Middleware to calculate progress and sync with Roadmaps

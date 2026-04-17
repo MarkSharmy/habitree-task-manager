@@ -9,7 +9,7 @@ const rolloverIncompleteItems = require('../utils/rolloverLogic');
 // @route   POST /api/tasks
 exports.createTask = async (req, res) => {
     try {
-        const { title, description, groupId, category, scheduledDate, subtasks } = req.body;
+        const { title, description, groupId, category, subtasks } = req.body;
 
         const task = await Task.create({
             userId: req.user.id,
@@ -17,7 +17,6 @@ exports.createTask = async (req, res) => {
             description, 
             groupId,
             category,
-            scheduledDate,
             subtasks
         });
 

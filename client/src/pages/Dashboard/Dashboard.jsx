@@ -81,13 +81,13 @@ const Dashboard = () => {
 
                 {/* Right Section: Stats */}
                 <aside className="stats-sidebar">
-                    <EfficiencyWidget score={efficiencyScore}/>
-
                     <div className="stat-card">
                         <h4>Todal Productivity Time</h4>
                         <p className="big-stat">{formatMinutes(totalProductivityMinutes)}</p>
                         <small>Sums all completed sessions.</small>
                     </div>
+
+                    <EfficiencyWidget score={efficiencyScore}/>
 
                     <div className="stat-card">
                         <h4>Weekly Overview</h4>

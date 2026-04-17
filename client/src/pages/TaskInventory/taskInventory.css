@@ -1,0 +1,86 @@
+.inventory-container {
+    padding: 2rem;
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+.inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.create-task-btn {
+    background-color: #4facfe;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.inventory-controls {
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.search-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    color: #94a3b8;
+}
+
+.search-wrapper input {
+    width: 100%;
+    padding: 0.6rem 0.6rem 0.6rem 2.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 1rem;
+    background: #f1f5f9;
+}
+
+.tasks-grid {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    overflow-x: scroll;
+}
+
+.no-results {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 12.5rem;
+    color: #94a3b8;
+    background: white;
+    border-radius: 1rem;
+    border: 2px dashed #e2e8f0;
+    font-style: italic;
+}
+
+.count-badge {
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 0.1rem 0.5rem;
+    border-radius: 0.25rem;
+}

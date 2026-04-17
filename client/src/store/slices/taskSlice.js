@@ -1,74 +1,65 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import API from '../../api/axiosInstance';
 
-//Fetch today's planner ( Backend triggers Rollover automatically)
-export const fetchDailyPlanner = createAsyncThunk(
-    'tasks/fetchPlanner',
-    async (date, { rejectWithValue }) => {
-        try {
-
-            const response = await API.get(`/api/tasks/planner/today`);
-            return response.data.plannerItems;
-
-        } catch (err) {
-            return rejectWithValue(err.response.data);
-        }
+export const fetchInventoryTasks = createAsyncThunk(
+    'tasks/fetchAll', 
+    async () => {
+        const response = await API.get('/tasks');
+        return response.data;
     }
 );
 
-//Toggle Task or Subtask Status
-export const updateItemStatus = createAsyncThunk(
-    'tasks/updateStatus',
-    async ({ id, parentTaskId, status }, { rejectWithValue }) => {
-        try {
+export const createNewTask = createAsyncThunk(
+    'tasks/create',
+    async (taskData) => {
+        const reponse = await API.post('/tasks', taskData);
+        return response.data;
+    }
+);
 
-            let response;
+export const updateTask = createAsyncThunk(
+    'tasks/update',
+    async ({ id, updates }) => {
+        const response = await API.put(`/tasks/${id}`, updates);
+        return response.data;
+    }
+);
 
-            if (parentTaskId) {
-                response = await API.patch(`/api/tasks/${parentTaskId}/subtasks/${id}`);
-            }else {
-                response = await API.patch(`/api/tasks/${id}/status`, { status });
-            }
-
-            return { data: response.data, iSubtask: !!parentTaskId, id };
-
-        }catch(err) {
-            return rejectWithValue(err.response.data);
-        }
+export const deleteTask = createAsyncThunk(
+    'tasks/delete',
+    async (id) => {
+        await API.delete(`/tasks/${id}`);
+        return id;
     }
 );
 
 const taskSlice = createSlice({
     name: 'tasks',
     initialState: {
-        planner: { tasks: [], subtasks: [] },
+        inventory: {},
         loading: false,
-        error: null,
+        error: null
     },
-    reducers: {
-        //Real-time update from socket.io
-        syncTaskUpdate: (state, action) => {
-            const index = state.planner.tasks.findIndex(t => t._id === action.payload._id);
-            if (index !== -1) state.planner.tasks[index] = action.payload;
-        },
-        clearTaskError: (state) => {
-            state.error = null;
-        }
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(fetchDailyPlanner.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchDailyPlanner.fulfilled, (state, action) => {
+            .addCase(fetchInventoryTasks.pending, (state) => state.loading = true)
+            .addCase(fetchInventoryTasks.fulfilled, (state, action) => {
                 state.loading = false;
-                state.planner = action.payload;
+                state.inventory = action.payload;
             })
-            .addCase(updateItemStatus.rejected, (state, action) => {
-                state.error = action.payload.message;
+            .addCase(createNewTask.fulfilled, (state, action) => {
+                state.loading = false;
             })
+            .addCase(updateTask.fulfilled, (state, action) => {
+                const updatedTask = action.payload;
+            })
+            .addCase(deleteTask.fulfilled, (state, action) => {
+                const deletedId = action.payload;
+            });
+            
+
     }
 });
 
-export const { syncTaskUpdate, clearTaskError } = taskSlice.actions;
 export default taskSlice.reducer;
