@@ -13,6 +13,7 @@ const TaskInventory = () => {
     const { inventory, loading } = useSelector((state) => state.tasks);
 
     useEffect(() => {
+        console.log('useEffect');
         dispatch(fetchInventoryTasks());
     }, [dispatch]);
 

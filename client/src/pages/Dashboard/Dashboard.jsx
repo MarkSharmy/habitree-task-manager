@@ -15,7 +15,7 @@ import './dashboard.css';
 const Dashboard = () => {
     const dispatch = useDispatch();
     
-    const { tasks, subtasks } = useSelector((state) => state.tasks.planner );
+    const { tasks, subtasks } = useSelector((state) => state.tasks );
     const { efficiencyScore, totalProductivityMinutes } = useSelector((state) => state.stats);
 
     const [isSettingsOpen, setSettingsOpen] = useState(false);
@@ -69,12 +69,7 @@ const Dashboard = () => {
                             <button className="start-session-btn" onClick={() => setSettingsOpen(true)}>Start Session</button>
                         </div>
                         <div className="task-list">
-                            {tasks.map(task => (
-                                <TaskItem key={task._id} item={task}/>
-                            ))}
-                            {subtasks.map(sub => (
-                                <TaskItem key={sub._id} item={sub} isSubtask={true}/>
-                            ))}
+                            
                         </div>
                     </div>
                 </section>
