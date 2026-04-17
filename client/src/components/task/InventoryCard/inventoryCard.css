@@ -1,10 +1,16 @@
 .inventory-card {
     background: white;
     border-radius: 1rem;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--grey-bd);
     padding: 1.5rem;
-    width: 20rem;
+    width: 12.5rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    transition: transform 0.1s;
+    cursor: pointer;
+}
+
+.inventory-card:hover {
+    transform: scale(1.05);
 }
 
 .group-title {
@@ -12,6 +18,9 @@
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
+    color: var(--dark-text);
+    font-size: 0.7rem;
+    font-weight: 400;
 }
 
 .accent-bar {
@@ -26,8 +35,28 @@
     align-items: center;
 }
 
+.card-body h3 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dark-text)
+}
+
+.category-label {
+    color: var(--soft-text);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.progress-text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    color: var(--light-text)
+}
+
 .icon-box {
-    padding: 0.5rem;
+    padding: 0.3rem;
     color: white;
     border-radius: 0.5rem;
 }
@@ -59,8 +88,8 @@
 }
 
 .new-task-placeholder {
-    width: 20rem;
-    height: 15rem;
+    width: 12.5rem;
+    height: 12.5rem;
     border: 2px dashed #e2e8f0;
     border-radius: 1rem;
     display: flex;
@@ -73,4 +102,33 @@
 
 .new-task-placeholder:hover {
     transform: scale(1.1);
+}
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.7rem;
+}
+
+.date-info {
+    color: var(--soft-text);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.date-info span {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.edit-task-link {
+    color: var(--btn-blue);
+    background-color: white;
+    border-radius: 0.5rem;
+    border: 2px solid var(--grey-bd);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
 }

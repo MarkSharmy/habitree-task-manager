@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Search, Plus, Filter } from 'lucide-react';
 
 import InventoryCard from '../../components/task/InventoryCard/InventoryCard';
-import { fetchInventoryTasks } from '../../store/slices/taskSlice';
+import { createNewTask, fetchInventoryTasks } from '../../store/slices/taskSlice';
 import './taskInventory.css';
 
 const TaskInventory = () => {
@@ -13,9 +13,12 @@ const TaskInventory = () => {
     const { inventory, loading } = useSelector((state) => state.tasks);
 
     useEffect(() => {
-        console.log('useEffect');
         dispatch(fetchInventoryTasks());
     }, [dispatch]);
+
+    const handleCreateTask = () => {
+        dispatch(createNewTask());
+    }
 
     const filteredGroups = useMemo(() => {
         const query = searchQuery.toLowerCase().trim();
@@ -103,7 +106,7 @@ const TaskInventory = () => {
                                         title={task.title}
                                         category={task.category}
                                         progress={task.progress || 0}
-                                        date={task.scheduledDate ? new Date(task.scheduledDate).toLocaleDateString() : 'Unscheduled'}
+                                        date={task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Unscheduled'}
                                         status={task.status}
                                         groupColor={group.color}
                                     />

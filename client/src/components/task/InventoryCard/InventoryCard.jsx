@@ -10,7 +10,7 @@ const InventoryCard = ({ title, category, progress, date, status, groupColor }) 
                     className="icon-box" 
                     style={{ backgroundColor: groupColor || '#3b82f6' }}
                 >
-                    <Folder size={16} color="white" />
+                    <Folder size={14} strokeWidth={2} color="white" />
                 </div>
                 <span className={`status-tag ${status.toLowerCase().replace(' ', '-')}`}>
                     {status}

@@ -1,4 +1,6 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from '../store/slices/authSlice';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
     ListTodo,
@@ -10,14 +12,22 @@ import {
     Bell,
     Search,
     BarChart,
-    Kanban
+    Kanban,
+    LogOut
 } from 'lucide-react';
 import Logo from '../assets/logo.png';
 import './mainlayout.css';
 
 const MainLayout = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const location = useLocation();
     const isActive = (path) => location.pathname === path ? 'active' : '';
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/');
+    }
 
     return (
         <div className="app-shell">
@@ -60,6 +70,10 @@ const MainLayout = () => {
                         <Settings size={20} strokeWidth={2} />
                         <span>Settings</span>
                     </Link>
+                    <button className="logout-btn" onClick={handleLogout}>
+                        <LogOut size={20} />
+                        <span>Logout</span>
+                    </button>
                 </div>
             </aside>
             <div className="content-area">

@@ -12,7 +12,7 @@ export const fetchInventoryTasks = createAsyncThunk(
 export const createNewTask = createAsyncThunk(
     'tasks/create',
     async (taskData) => {
-        const reponse = await API.post('/tasks', taskData);
+        const response = await API.post('/tasks', taskData);
         return response.data;
     }
 );
@@ -40,10 +40,11 @@ const taskSlice = createSlice({
         loading: false,
         error: null
     },
-    reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(fetchInventoryTasks.pending, (state) => state.loading = true)
+            .addCase(fetchInventoryTasks.pending, (state) => {
+                state.loading = true
+            })
             .addCase(fetchInventoryTasks.fulfilled, (state, action) => {
                 state.loading = false;
                 state.inventory = action.payload;
@@ -57,8 +58,6 @@ const taskSlice = createSlice({
             .addCase(deleteTask.fulfilled, (state, action) => {
                 const deletedId = action.payload;
             });
-            
-
     }
 });
 

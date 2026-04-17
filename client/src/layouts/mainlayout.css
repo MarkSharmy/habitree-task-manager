@@ -1,12 +1,3 @@
-:root {
-    --sb-width: 12.25rem;
-    --header-h: 4.375rem;
-    --bg-main: #fcfbf7;
-    --sidebar-bg: #ffffff;
-    --primary: #3498bd;
-    --text-muted: #636e72;
-}
-
 .app-shell {
     display: flex;
     min-height: 100vh;
@@ -32,6 +23,31 @@
 
 .sidebar-footer {
     padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-left: 0.5rem;
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 0.5rem;
+}
+
+.logout-btn:hover {
+    background-color: #fff1f2; /* Light red background */
+    color: #e11d48; /* Red text */
 }
 
 .sidebar-nav {

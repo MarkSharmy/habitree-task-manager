@@ -1,3 +1,18 @@
+:root {
+    --sb-width: 12.25rem;
+    --header-h: 4.375rem;
+    --bg-main: #fcfbf7;
+    --sidebar-bg: #ffffff;
+    --primary: #3498bd;
+    --text-muted: #636e72;
+    --light-bg: #fff;
+    --grey-bd: #e2e8f0;
+    --btn-blue: #3498bd;
+    --soft-text: #69696b;
+    --light-text: #a8a8a8;
+    --dark-text: #3d3d3d;
+}
+
 /* Rubik - Light 300 */
 @font-face {
   font-family: 'Rubik';
