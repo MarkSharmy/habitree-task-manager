@@ -1,14 +1,19 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // Added for navigation
 import { Search, Plus, Filter } from 'lucide-react';
-
+import { BarLoader } from 'react-spinners';
 import InventoryCard from '../../components/task/InventoryCard/InventoryCard';
+import CreateTaskModal from '../../components/modals/Task/CreateTaskModal';
+
 import { createNewTask, fetchInventoryTasks } from '../../store/slices/taskSlice';
 import './taskInventory.css';
 
 const TaskInventory = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate(); // Initialize navigation
     const [searchQuery, setSearchQuery] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
     
     const { inventory, loading } = useSelector((state) => state.tasks);
 
@@ -16,30 +21,34 @@ const TaskInventory = () => {
         dispatch(fetchInventoryTasks());
     }, [dispatch]);
 
-    const handleCreateTask = () => {
-        dispatch(createNewTask());
-    }
+    const handleCreateTask = async (taskData) => {
+        const payload = {
+            title: taskData.taskTitle,
+            groupId: taskData.selectedGroupId,
+            category: taskData.category,
+            subtasks: taskData.subtasks.map(st => ({ title: st }))
+        };
+
+        await dispatch(createNewTask(payload)).unwrap(); 
+        setIsModalOpen(false);
+        dispatch(fetchInventoryTasks()); 
+    };
 
     const filteredGroups = useMemo(() => {
         const query = searchQuery.toLowerCase().trim();
-        
-        // Transform the object into a renderable array
         const groupEntries = Object.entries(inventory)
-            .filter(([_, tasks]) => tasks.length > 0) // Hide empty groups (like Uncategorized)
+            .filter(([_, tasks]) => tasks.length > 0)
             .map(([groupName, tasks]) => {
-                // Get group metadata from the first task's populated groupId
                 const groupMeta = tasks[0]?.groupId;
-                
                 return {
                     name: groupName,
-                    color: groupMeta?.color || '#64748b', // Fallback color
+                    color: groupMeta?.color || '#64748b',
                     tasks: tasks
                 };
             });
 
         if (!query) return groupEntries;
 
-        // Perform the deep filter
         return groupEntries.map(group => {
             const matchingTasks = group.tasks.filter(task =>
                 task.title.toLowerCase().includes(query) ||
@@ -51,9 +60,9 @@ const TaskInventory = () => {
 
     if (loading && Object.keys(inventory).length === 0) {
         return (
-            <div className="inventory-loader-container">
-                <div className="loader-spinner"></div>
-                <p>Syncing your tasks...</p>
+            <div className="details-loader-container">
+                <BarLoader color="#3b82f6" />
+                <p>Syncing Data...</p>
             </div>
         );
     }
@@ -65,7 +74,7 @@ const TaskInventory = () => {
                     <h1>Task Inventory</h1>
                     <p>Manage and organise your tasks and goals</p>
                 </div>
-                <button className="create-task-btn">
+                <button className="create-task-btn" onClick={() => setIsModalOpen(true)}>
                     <Plus size={18} /> Create Task
                 </button>
             </header>
@@ -91,28 +100,26 @@ const TaskInventory = () => {
                     filteredGroups.map((group) => (
                         <section key={group.name} className="group-section">
                             <div className="group-title">
-                                <span 
-                                    className="accent-bar" 
-                                    style={{ backgroundColor: group.color }}
-                                ></span>
+                                <span className="accent-bar" style={{ backgroundColor: group.color }}></span>
                                 <h2>{group.name}</h2>
                                 <span className="count-badge">{group.tasks.length} TASKS</span>
                             </div>
                             
                             <div className="tasks-grid">
                                 {group.tasks.map(task => (
-                                    <InventoryCard 
-                                        key={task._id}
-                                        title={task.title}
-                                        category={task.category}
-                                        progress={task.progress || 0}
-                                        date={task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Unscheduled'}
-                                        status={task.status}
-                                        groupColor={group.color}
-                                    />
+                                    <div key={task._id} onClick={() => navigate(`/tasks/${task._id}`)} className="card-clickable-wrapper">
+                                        <InventoryCard 
+                                            title={task.title}
+                                            category={task.category}
+                                            progress={task.progress || 0}
+                                            date={task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Unscheduled'}
+                                            status={task.status}
+                                            groupColor={group.color}
+                                        />
+                                    </div>
                                 ))}
                                 
-                                <div className="new-task-placeholder">
+                                <div className="new-task-placeholder" onClick={() => setIsModalOpen(true)}>
                                     <Plus size={24} />
                                     <span>NEW TASK</span>
                                 </div>
@@ -121,16 +128,16 @@ const TaskInventory = () => {
                     ))
                 ) : (
                     <div className="no-results">
-                        {searchQuery ? (
-                            <p>No tasks match "<strong>{searchQuery}</strong>"</p>
-                        ) : (
-                            <div className="empty-inventory-state">
-                                <p>Your inventory is empty.</p>
-                            </div>
-                        )}
+                        {searchQuery ? <p>No tasks match "<strong>{searchQuery}</strong>"</p> : <p>Your inventory is empty.</p>}
                     </div>
                 )}
             </div>
+            
+            <CreateTaskModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onCreate={handleCreateTask}
+            />
         </div>
     );
 };

@@ -27,6 +27,33 @@ exports.createTask = async (req, res) => {
     }
 }
 
+// @desc    Get a single task by ID
+// @route   GET /api/tasks/:id
+exports.getTaskById = async (req, res) => {
+    try {
+        // Find the task by ID and ensure it belongs to the logged-in user
+        // We populate 'groupId' to get the group name and color for the Details sidebar
+        const task = await Task.findOne({ 
+            _id: req.params.id, 
+            userId: req.user.id 
+        }).populate('groupId', 'name color');
+
+        if (!task) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Task not found" 
+            });
+        }
+
+        res.json(task);
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            message: error.message 
+        });
+    }
+};
+
 // @desc    Get all tasks grouped by their user-defined Groups
 // @route   GET /api/tasks
 exports.getGroupedTasks = async (req, res) => {
@@ -120,123 +147,6 @@ exports.deleteTask = async (req, res) => {
     }
 }
 
-
-// @desc    Get all tasks scheduled for today
-// @route   GET /api/tasks/planner/today
-exports.getDailyPlanner = async (req, res) => {
-    try {
-
-        await rolloverIncompleteItems(req.user.id);
-
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-
-        const endOfToday = new Date();
-        endOfToday.setHours(23, 59, 59, 999);
-
-        const tasks = await Task.find({
-            userId: req.user.id,
-            scheduledDate: { $gte: startOfToday, $lte: endOfToday }
-        });
-
-        const tasksWithSubtasks = await Task.find({
-            userId: req.user.id,
-            "subtasks.scheduledDate": { $gte: startOfToday, $lte: endOfToday }
-        });
-
-        // FLatten subtasks for the frontend planner view
-        let scheduledSubtasks = [];
-        tasksWithSubtasks.forEach(t => {
-            const filtered = t.subtasks.filter(st => 
-                st.scheduledDate >= startOfToday && st.scheduledDate <= endOfToday
-            );
-            scheduledSubTasks.push(...filtered.map(st => ({
-                ...st.toObject(),
-                parentTaskId: t._id,
-                parentTitle: t.title
-            })));
-        });
-
-        res.json({
-            success: true,
-            plannerItems: {
-                tasks,
-                subtasks: scheduledSubtasks
-            }
-        });
-        
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
-
-// @desc    Get tasks fro a specific date (Daily Planner)
-// @route   GET /api/tasks/planner/:date
-exports.getTasksByDay = async (req, res) => {
-
-    try {
-        const { date } = req.query;
-        const start = new Date(date);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(date);
-        end.setHours(23, 59, 59, 999);
-
-        // 1. Get Schduled Top-Level Tasks
-        const tasks = await Task.find({
-            userId: req.user.id,
-            scheduledDate: { $gte: start, $lte: end }
-        });
-
-        // 2. Get Tasks that contain schduled subtasks for this date
-        const tasksWithSubtasks = await Task.find({
-            userId: req.user.id,
-            "subtasks.scheduledDate": { $gte: start, $lte: end }
-        });
-
-        // FLatten subtasks for the frontend planner view
-        let scheduledSubtasks = [];
-        tasksWithSubtasks.forEach(t => {
-            const filtered = t.subtasks.filter(st => 
-                st.scheduledDate >= start && st.scheduledDate <= end
-            );
-            scheduledSubTasks.push(...filtered.map(st => ({ ...st.toObject(), parentTaskId: t._id, parentTitle: t.title })));
-        });
-
-        res.json({
-            success: true,
-            plannerItems: {
-                tasks,
-                subtasks: scheduledSubtasks
-            }
-        });
-
-    }catch(error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
-
-// @desc    Schedule a task for a specific date 
-// @route   PUT /api/tasks/:id/schedule
-exports.scheduleTask = async (req, res) => {
-    try {
-        const { dateString } = req.body; // expecting ISO date string
-        const date = new Date(dateString);
-        if(isNaN(date.getTime())) return res.status(400).json({ success: false, message: "Incorrect date format" });
-
-        const task = await Task.findOneAndUpdate(
-            { _id: req.params.id, userId: req.user.id },
-            { scheduledDate: new Date(date) },
-            { new: true }
-        );
-
-        if (!task) return res.status(404).json({ success: false, message: "Task not found" });
-
-        res.json({ success: true, task });
-        
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-}
 
 // @desc    Update task status and sync with Kanban
 exports.updateTaskStatus = async (req, res) => {

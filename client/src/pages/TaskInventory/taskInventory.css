@@ -34,6 +34,10 @@
     cursor: pointer;
 }
 
+.create-task-btn:hover {
+    background-color: var(--btn-blue-hover);
+}
+
 .inventory-controls {
     background: white;
     padding: 1rem;

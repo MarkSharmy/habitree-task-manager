@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BarLoader } from 'react-spinners';
 import { useSelector, useDispatch } from 'react-redux';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -16,7 +17,7 @@ const Dashboard = () => {
     const dispatch = useDispatch();
     
     const { tasks, subtasks } = useSelector((state) => state.tasks );
-    const { efficiencyScore, totalProductivityMinutes } = useSelector((state) => state.stats);
+    const { efficiencyScore, totalProductivityMinutes, loading } = useSelector((state) => state.stats);
 
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [isActiveModalOpen, setActiveModalOpen] = useState(false);
@@ -43,6 +44,8 @@ const Dashboard = () => {
     useEffect(() => {
         dispatch(fetchTodayStats());
     }, [dispatch]);
+
+    if (loading) return <div className="details-loader-container"><BarLoader color="#3b82f6" /><p>Syncing...</p></div>;
 
     return (
 

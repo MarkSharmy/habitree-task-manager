@@ -1,0 +1,228 @@
+.modal-content {
+    background: white;
+    width: 32rem;
+    border-radius: 1.5rem;
+    padding: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    max-height: 90vh;
+}
+
+.modal-logo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.modal-logo h2 {
+    font-size: 1.25rem;
+    color: var(--dark-text);
+    font-weight: 600;
+}
+
+.modal-body {
+    margin-top: 1rem;
+}
+.form-group {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--dark-text);
+}
+
+input[type="text"], select {
+    padding: 0.3rem 0.85rem;
+    border: 1px solid var(--grey-bd);
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    background: var(--input-bg);
+}
+
+.group-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.group-selector {
+    width: 9rem;
+}
+
+.group-input {
+    width: 8rem;
+}
+
+/* .flex-1 { flex: 1 }
+.flex-2 { flex: 2 } */
+
+.color-picker-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+input[type="color"] {
+    border: 1px solid var(--grey-bd);
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.add-group-btn {
+    background: var(--btn-blue);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.add-group-btn:hover {
+    background-color: var(--btn-blue-hover);
+}
+
+.category-options {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.cat-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.75rem;
+    border: 2px solid var(--grey-bd);
+    border-radius: 1rem;
+    background: white;
+    color: var(--dark-text);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.cat-btn.active {
+    background-color: #eff6ff;
+    border-color: var(--primary);
+    color:var(--primary);
+}
+
+.subtasks-list {
+    height: 4rem;
+    padding: 0.5rem;
+    border: 2px solid var(--grey-bd);
+    border-radius: 0.5rem;
+    overflow-y: scroll;
+}
+
+.subtask-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    background: white;
+    border: 1px solid var(--grey-bd);
+}
+
+.subtask-item input {
+    flex: 1;
+    background: white;
+    border: none;
+    color: var(--soft-text);
+}
+
+.subtask-item button {
+    color: var(--light-text);
+    border: none;
+    outline: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.add-subtask-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    border: 1px solid var(--grey-bd);
+
+}
+
+.add-subtask-row input {
+    flex: 2;
+}
+
+.inline-add-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--grey-bd);
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    background: #fff;
+    color: var(--soft-text);
+    cursor: pointer;
+    flex: 1;
+}
+
+.modal-loader-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 0;
+    gap: 1.5rem;
+    color: #64748b;
+}
+
+/* Ensure the color picker input looks consistent with your UI */
+input[type="color"] {
+    -webkit-appearance: none;
+    border: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.cancel-btn {
+    padding: 0.75rem 2rem;
+    border: 2px solid var(--grey-bd);
+    border-radius: 0.75rem;
+    background: white;
+    color: var(--soft-text);
+    cursor: pointer;
+}
+
+.create-btn {
+    padding: 0.7rem 2rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: var(--btn-blue);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.create-btn:hover {
+    background-color: var(--btn-blue-hover);
+}

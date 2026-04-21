@@ -125,7 +125,7 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
                     <button className="close-btn" onClick={onClose}><X size={20} strokeWidth={2} /></button>
                 </header>
 
-                <div className="modal-body">
+                <div className="sesison-modal-body">
                     <h3 className="session-status">
                         Session: <span className="status-blue">On Going</span>
                     </h3>
@@ -171,7 +171,7 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
                     </div>
                 </div>
 
-                <footer className="modal-footer">
+                <footer className="session-modal-footer">
                     <span><Info size={16} /></span>
                     <p>Session will be added to Today's Productivity</p>
                 </footer>

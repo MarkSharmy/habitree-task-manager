@@ -8,6 +8,7 @@ import TaskInventory from './pages/TaskInventory/TaskInventory';
 
 import NotFound from './pages/NotFound/NotFound';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import TaskDetails from './pages/TaskDetails/TaskDetails';
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route element={ <ProtectedRoute><MainLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tasks" element={<TaskInventory />} />
+          <Route path="/tasks/:id" element={<TaskDetails />} />
         </Route>
 
         {/* Redirect unknown routes */}

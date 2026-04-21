@@ -20,17 +20,24 @@
 .modal-header {
     display: flex;
     justify-content: space-between;
-    padding: 0.5rem 1rem;
     border-bottom: 2px solid #e0e0e0;
 }
 
-.modal-body {
+.close-btn {
+    color: var(--light-text);
+    border: none;
+    outline: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.session-modal-body {
     margin: 1rem 2rem;
     padding: 1rem;
     border: 2px solid #e0e0e0;
 }
 
-.modal-footer {
+.session-modal-footer {
     border-top: 2px solid #f0f0f0;
     padding: 1.25rem 2rem;
     display: flex;

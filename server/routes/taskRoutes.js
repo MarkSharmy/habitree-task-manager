@@ -16,20 +16,10 @@ router.route('/')
     .post(taskController.createTask);    // Create a new task
 
 router.route('/:id')
+    .get(taskController.getTaskById)
     .put(taskController.updateTask)      // General update (title, description, etc.)
     .delete(taskController.deleteTask);  // Cleanup task and all roadmap/project refs
 
-/**
- * @section Daily Planner & Scheduling
- */
-// Unified planner for "Today" (Triggers Rollover Logic)
-router.get('/planner/today', taskController.getDailyPlanner);
-
-// Get items for a specific date (Historical or Future)
-router.get('/planner/date', taskController.getTasksByDay);
-
-// Assign a task to a specific date
-router.put('/:id/schedule', taskController.scheduleTask);
 
 /**
  * @section Task Execution & Status

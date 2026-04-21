@@ -121,7 +121,7 @@ const Landing = () => {
                 </div>
             </section>
 
-            <footer>
+            <footer className="landing-footer">
                 <small className="copyright">© Copyright Habitree Task Manager.</small>
                 <div className="author">Developed By Mark Sharmy</div>
             </footer>

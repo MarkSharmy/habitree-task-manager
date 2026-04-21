@@ -217,7 +217,7 @@
 }
 
 /* Footer  */
-footer {
+.landing-footer {
     color: #2d3436;
     background-color: #eee;
     padding: 1rem 2rem;
@@ -225,7 +225,7 @@ footer {
     flex-direction: column;
 }
 
-footer .copyright, .author {
+.landing-footer .copyright, .author {
     text-align: center;
     font-size: small;
     font-weight: 400;
