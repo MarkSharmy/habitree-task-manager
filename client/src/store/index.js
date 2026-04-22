@@ -4,6 +4,7 @@ import taskReducer from './slices/taskSlice';
 import roadmapReducer from './slices/roadmapSlice';
 import statsReducer from './slices/statsSlice';
 import groupReducer from './slices/groupSlice';
+//import plannerReducer from './slices/plannerSlice';
 
 export const store = configureStore({
     reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
         stats: statsReducer,
         roadmap: roadmapReducer,
         groups: groupReducer,
+        //planner: plannerReducer,
     },
     //Add middleware here...
 });
