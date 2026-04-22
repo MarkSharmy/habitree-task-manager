@@ -4,15 +4,24 @@ const PlannerSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        require: true
+        required: true
     },
     date: {
         type: String,
-        require: true
+        required: true
     },
     tasks: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Task'
+        taskId: { 
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Task',
+            required: true 
+        },
+        subtaskId: { 
+            type: String, 
+            default: null 
+        },
+        time: { type: String, default: "08:00" },
+        comments: { type: String, default: "" }
     }]
 }, { timestamps: true });
 

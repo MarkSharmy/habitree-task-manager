@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { BarLoader } from 'react-spinners';
 import { fetchTaskById, clearCurrentTask, updateTaskAction } from '../../store/slices/taskSlice';
+import ScheduleTaskModal from '../../components/modals/Scheduler/SchedulerModal';
 import { 
     Calendar, Settings, Info, ListTodo, 
     Trash2, PlayCircle, User, Tag, Folder, CheckCircle
@@ -16,6 +17,9 @@ const TaskDetails = () => {
     
     const [descInput, setDescInput] = useState("");
     const [newSubtask, setNewSubtask] = useState("");
+
+    const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+    const [selectedItemForSchedule, setSelectedItemForSchedule] = useState(null);
 
     useEffect(() => {
         dispatch(fetchTaskById(id));
@@ -58,6 +62,17 @@ const TaskDetails = () => {
         setNewSubtask("");
     };
 
+    const openScheduler = (item = task) => {
+    // If the item being passed is NOT the main task (i.e., it's a subtask),
+    // manually attach the parentId so the Modal can find it.
+    const itemWithContext = item._id === task._id 
+        ? item 
+        : { ...item, parentId: task._id, category: task.category, groupId: task.groupId };
+
+    setSelectedItemForSchedule(itemWithContext);
+    setIsScheduleModalOpen(true);
+};
+
     if (detailsLoading || !task) return <div className="details-loader-container"><BarLoader color="#3b82f6" /><p>Syncing...</p></div>;
     
     return (
@@ -70,7 +85,9 @@ const TaskDetails = () => {
                     <h1>{task.title}</h1>
                 </div>
                 <div className="header-actions">
-                    <button className="btn-add-schedule"><Calendar size={18} /> Add to Schedule</button>
+                    <button className="btn-add-schedule" onClick={() => openScheduler()}>
+                        <Calendar size={18} /> Add to Schedule
+                    </button>
                     <button className="btn-icon-settings"><Settings size={18} /></button>
                 </div>
             </header>
@@ -104,7 +121,12 @@ const TaskDetails = () => {
                                         />
                                     </div>
                                     <div className="subtask-right">
-                                        <button className="btn-sub-action"><Calendar size={14} /></button>
+                                        <button 
+                                            className="btn-sub-action" 
+                                            onClick={() => openScheduler(st)}
+                                        >
+                                            <Calendar size={14} />
+                                        </button>
                                         <Trash2 size={14} className="btn-sub-action delete" onClick={() => handleDeleteSubtask(st._id)} />
                                     </div>
                                 </div>
@@ -176,6 +198,13 @@ const TaskDetails = () => {
                     </div>
                 </aside>
             </div>
+
+            <ScheduleTaskModal 
+                isOpen={isScheduleModalOpen}
+                onClose={() => setIsScheduleModalOpen(false)}
+                task={selectedItemForSchedule}
+            />
+
         </div>
     );
 };

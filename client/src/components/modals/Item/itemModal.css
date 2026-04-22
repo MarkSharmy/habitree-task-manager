@@ -1,0 +1,139 @@
+.item-modal-content {
+    background: white;
+    width: 90%;
+    max-width: 32rem;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.task-display-title {
+    font-size: 1.4rem;
+    color: #1e293b;
+    margin-bottom: 1.2rem;
+}
+
+.meta-info-grid {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.value-badge {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.time-info-row {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.time-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #f8fafc;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    color: #64748b;
+    font-size: 0.9rem;
+    border: 1px solid #e2e8f0;
+}
+
+.detail-list {
+    margin-bottom: 2rem;
+}
+
+.detail-item {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.detail-label {
+    width: 5rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #1e293b;
+}
+
+.status-text {
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.action-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-top: 1rem;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.btn-action.complete {
+    background: #f0fdf4;
+    color: #16a34a;
+    border-color: #bbf7d0;
+}
+
+.btn-action.shelve {
+    background: #fff7ed;
+    color: #ea580c;
+    border-color: #fed7aa;
+}
+
+.btn-action.remove {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.btn-action.cancel {
+    background: white;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+
+.btn-action:hover {
+    filter: brightness(0.95);
+}
+
+/* Tablet and Mobile adjustments */
+@media (max-width: 48rem) {
+    .item-modal-content {
+        width: 95%;
+        padding: 1rem;
+    }
+    
+    .action-footer {
+        justify-content: center;
+    }
+}

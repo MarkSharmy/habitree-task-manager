@@ -1,49 +1,60 @@
 const Planner = require('../models/planner');
-const Task = require('../models/task');
 
-// @desc    Get planner for a specific date (creates if doesn't exist)
-// @route   GET /api/planner/:date
 exports.getPlannerByDate = async (req, res) => {
     try {
-
         const { date } = req.params;
         const userId = req.user.id;
 
         let planner = await Planner.findOne({ userId, date })
             .populate({
-                path: 'tasks',
-                populate: { path: 'groupId', select: 'name color'}
+                path: 'tasks.taskId',
+                populate: { path: 'groupId', select: 'name color' }
             });
 
         if (!planner) {
-            planner = await Planner.create({
-                userId,
-                date,
-                tasks: []
-            })
+            planner = await Planner.create({ userId, date, tasks: [] });
         }
 
         res.status(200).json(planner);
-
-    }catch(error) {
+    } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
-// @desc    Add a task to a specific date's planner
-// @route   POST /api/planner/:date/add
+// controllers/plannerController.js
+
 exports.addTaskToPlanner = async (req, res) => {
     try {
         const { date } = req.params;
-        const { taskId } = req.body;
+        const { taskId, subtaskId, time, comments } = req.body;
+        const userId = req.user.id;
 
-        const planner = await Planner.findOneAndUpdate(
-            { userId: req.user.id, date },
-            { $addToSet: { tasks: taskId } },
-            { new: true, upsert: true } 
-        ).populate('tasks');
+        // Validation: Don't allow null taskId
+        if (!taskId) {
+            return res.status(400).json({ success: false, message: "taskId is required" });
+        }
 
-        res.json(planner);
+        let planner = await Planner.findOne({ userId, date });
+        if (!planner) {
+            planner = new Planner({ userId, date, tasks: [] });
+        }
+
+        // Check if this specific combo is already there
+        const alreadyScheduled = planner.tasks.find(t => 
+            t.taskId?.toString() === taskId && t.subtaskId === subtaskId
+        );
+
+        if (!alreadyScheduled) {
+            planner.tasks.push({ taskId, subtaskId, time, comments });
+            await planner.save();
+        }
+
+        const updatedPlanner = await Planner.findById(planner._id).populate({
+            path: 'tasks.taskId',
+            populate: { path: 'groupId', select: 'name color' }
+        });
+
+        res.status(201).json(updatedPlanner);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

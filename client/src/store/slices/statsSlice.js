@@ -5,7 +5,6 @@ export const fetchTodayStats = createAsyncThunk(
     'stats/today',
     async () => {
         const response = await API.get('/stats/today');
-        console.log(response.data);
         return response.data;
     }
 );
