@@ -7,6 +7,7 @@ import SessionSettings from '../../components/modals/Session/SessionSettings';
 import SessionModal from '../../components/modals/Session/SessionModal';
 import PlannerItem from '../../components/dashboard/PlannerItem/PlannerItem';
 import EfficiencyWidget from '../../components/dashboard/EfficiencyWidget/EfficiencyWidget';
+import ItemModal from '../../components/modals/Item/ItemModal';
 
 import { fetchTodayStats } from '../../store/slices/statsSlice';
 import { saveWorkSession } from '../../store/slices/sessionSlice';
@@ -17,10 +18,11 @@ import './dashboard.css';
 const Dashboard = () => {
     const dispatch = useDispatch();
     
-    // Select planner data
     const { activeDate, dayData, loading: plannerLoading } = useSelector((state) => state.planner);
     const { efficiencyScore, totalProductivityMinutes, loading: statsLoading } = useSelector((state) => state.stats);
 
+    const [selectedPlannerItem, setSelectedPlannerItem] = useState(null);
+    const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [isActiveModalOpen, setActiveModalOpen] = useState(false);
     const [sessionTime, setSessionTime] = useState(0);
@@ -43,6 +45,17 @@ const Dashboard = () => {
         current.setDate(current.getDate() + step);
         const dateStr = current.toISOString().split('T')[0];
         dispatch(setActiveDate(dateStr));
+    };
+
+    const handleItemClick = (entry) => {
+        setSelectedPlannerItem(entry);
+        setIsItemModalOpen(true);
+    };
+
+    const handleStatusUpdate = (id, newStatus) => {
+        console.log(`Updating item ${id} to ${newStatus}`);
+        // Dispatch your update action here (e.g., updatePlannerStatus)
+        setIsItemModalOpen(false);
     };
 
     // Trigger fetch whenever activeDate changes
@@ -93,12 +106,17 @@ const Dashboard = () => {
                         </div>
                         <div className="task-list">
                             {dayData?.tasks?.map((entry) => (
-                                <PlannerItem 
+                                <div 
                                     key={entry._id} 
-                                    item={entry.taskId}
-                                    scheduledTime={entry.time} 
-                                    specificSubtaskId={entry.subtaskId}
-                                />
+                                    onClick={() => handleItemClick(entry)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <PlannerItem 
+                                        item={entry.taskId} 
+                                        scheduledTime={entry.time} 
+                                        specificSubtaskId={entry.subtaskId}
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -145,6 +163,13 @@ const Dashboard = () => {
                     setActiveModalOpen(false);
                 }}
                 onClose={() => setActiveModalOpen(false)}
+            />
+
+            <ItemModal 
+                isOpen={isItemModalOpen}
+                onClose={() => setIsItemModalOpen(false)}
+                item={selectedPlannerItem}
+                onStatusUpdate={handleStatusUpdate}
             />
         </div>
     );

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Added useEffect
 import { useDispatch, useSelector } from 'react-redux';
 import { X, Calendar, Clock, Tag, Folder } from 'lucide-react';
 import { assignTaskToDate } from '../../../store/slices/plannerSlice';
@@ -7,48 +7,60 @@ import Logo from '../../../assets/logo.png';
 import './schedulerModal.css';
 
 const SchedulerModal = ({ isOpen, onClose, task }) => {
-
     const dispatch = useDispatch();
-
     const { scheduling } = useSelector((state) => state.planner);
 
+    // Initial states
     const [scheduleDate, setScheduleDate] = useState(new Date().toISOString().split('T')[0]);
     const [scheduleTime, setScheduleTime] = useState("08:00");
     const [comments, setComments] = useState("");
 
+    // FIX: Reset state whenever the modal opens or the task changes
+    useEffect(() => {
+        if (isOpen) {
+            setScheduleDate(new Date().toISOString().split('T')[0]);
+            setScheduleTime("08:00"); 
+            setComments("");
+        }
+    }, [isOpen, task]);
+
     if (!isOpen || !task) return null;
 
-    // SchedulerModal.jsx
+    const handleAddToPlanner = async () => {
+        try {
+            const payload = {
+                date: scheduleDate,
+                taskId: task.parentId || task._id,
+                subtaskId: task.parentId ? task._id : null,
+                time: scheduleTime,
+                comments
+            };
 
-const handleAddToPlanner = async () => {
-    try {
-        const payload = {
-            date: scheduleDate,
-            // Use task.parentId if it exists (subtask), otherwise use task._id (main task)
-            taskId: task.parentId || task._id,
-            subtaskId: task.parentId ? task._id : null,
-            time: scheduleTime,
-            comments
-        };
+            if (!payload.taskId) {
+                console.error("Error: taskId is missing.");
+                return;
+            }
 
-        if (!payload.taskId) {
-            console.error("Error: taskId is missing. Cannot schedule.");
-            return;
+            console.log("Payload:", payload);
+
+            await dispatch(assignTaskToDate(payload)).unwrap();
+            onClose();
+        } catch (error) {
+            console.error("Scheduling failed:", error);
         }
-
-        await dispatch(assignTaskToDate(payload)).unwrap();
-        onClose();
-    } catch (error) {
-        console.error("Scheduling failed:", error);
-    }
-};
+    };
 
     return (
         <div className="modal-overlay">
             <div className="schedule-modal-content">
                 <header className="modal-header">
-                    <div className="modal-logo"><img src={Logo} style={{height: '2.5rem'}}/> Scheduler</div>
-                    <button className="close-btn" onClick={onClose}><X size={20} strokeWidth={2} /></button>
+                    <div className="modal-logo">
+                        <img src={Logo} alt="Logo" style={{height: '2.5rem'}}/> 
+                        Scheduler
+                    </div>
+                    <button className="close-btn" onClick={onClose}>
+                        <X size={20} strokeWidth={2} />
+                    </button>
                 </header>
 
                 <div className="modal-body">
@@ -56,10 +68,14 @@ const handleAddToPlanner = async () => {
 
                     <div className="meta-info-row">
                         <div className="meta-pill">
-                            <Tag size={14} /> <span>Category:</span> <span className="value-badge">{task.category}</span>
+                            <Tag size={14} /> 
+                            <span>Category:</span> 
+                            <span className="value-badge">{task.category}</span>
                         </div>
                         <div className="meta-pill">
-                            <Folder size={14} /> <span>Group:</span> <span className="value-badge">{task.groupId?.name}</span>
+                            <Folder size={14} /> 
+                            <span>Group:</span> 
+                            <span className="value-badge">{task.groupId?.name}</span>
                         </div>
                     </div>
 
@@ -84,11 +100,6 @@ const handleAddToPlanner = async () => {
                         </div>
                     </div>
 
-                    <div className="static-info">
-                        <p><strong>Owner:</strong> Mark Sharmy</p>
-                        <p><strong>Subtask:</strong> {task.subtasks?.length > 0 ? "Yes" : "No"}</p>
-                    </div>
-
                     <div className="comments-area">
                         <label>Comments</label>
                         <textarea 
@@ -107,7 +118,6 @@ const handleAddToPlanner = async () => {
                         onClick={handleAddToPlanner} 
                         disabled={scheduling}
                     >
-                        {/* Dynamic Button Text */}
                         {scheduling ? "Adding..." : "Add to Planner"}
                     </button>
                 </footer>

@@ -16,11 +16,16 @@ export const fetchPlannerByDate = createAsyncThunk(
 
 export const assignTaskToDate = createAsyncThunk(
     'planner/assignTask',
-    async ({ date, taskId }, { rejectWithValue }) => {
-        try{
-            const response = await API.post(`/planner/${date}/add`, { taskId });
+    async ({ date, taskId, subtaskId, time, comments }, { rejectWithValue }) => {
+        try {
+            const response = await API.post(`/planner/${date}/add`, { 
+                taskId, 
+                subtaskId, 
+                time, 
+                comments 
+            });
             return response.data;
-        }catch(error) {
+        } catch(error) {
             return rejectWithValue(error.response.data);
         }
     }

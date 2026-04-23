@@ -29,6 +29,8 @@ exports.addTaskToPlanner = async (req, res) => {
         const { taskId, subtaskId, time, comments } = req.body;
         const userId = req.user.id;
 
+        console.log('Data:', { taskId, subtaskId, time, comments});
+
         // Validation: Don't allow null taskId
         if (!taskId) {
             return res.status(400).json({ success: false, message: "taskId is required" });

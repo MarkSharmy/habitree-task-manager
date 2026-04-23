@@ -5,7 +5,7 @@ export const saveWorkSession = createAsyncThunk(
     'session/save',
     async (sessionData, { rejectWithValue }) => {
         try {
-            const response = await API.post('/sessions', sessionData);
+            const response = await API.post('/sessions/save', sessionData);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);

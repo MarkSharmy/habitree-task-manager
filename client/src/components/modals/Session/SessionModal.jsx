@@ -103,7 +103,6 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
             <div className="session-modal">
                 <header className="modal-header">
                     <div className="modal-logo"><img src={Logo} style={{height: '2.5rem'}}/> Habitree</div>
-                    {/* Disable close button during sync */}
                     {!saving && (
                         <button className="close-btn" onClick={onClose}>
                             <X size={20} strokeWidth={2} />
