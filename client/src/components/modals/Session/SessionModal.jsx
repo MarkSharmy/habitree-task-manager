@@ -112,13 +112,11 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
 
                 <div className="sesison-modal-body">
                     {saving ? (
-                        /* Loading State UI */
                         <div className="sync-loading-container">
                             <BeatLoader color="#3b82f6" size={15} />
                             <p className="sync-text">Updating Sessions...</p>
                         </div>
                     ) : (
-                        /* Timer UI */
                         <>
                             <h3 className="session-status">
                                 Session: <span className="status-blue">On Going</span>

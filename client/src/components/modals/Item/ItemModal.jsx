@@ -1,24 +1,67 @@
-import React from 'react';
+import { useDispatch } from 'react-redux';
+import { updateTaskStatus } from '../../../store/slices/taskSlice';
+import { removeTaskFromPlanner } from '../../../store/slices/plannerSlice';
 import { 
     X, Tag, Folder, Calendar, Clock, 
-    User, CheckCircle2, Archive, Trash2 
+    CheckCircle2, Archive, Trash2 
 } from 'lucide-react';
 import Logo from '../../../assets/logo.png';
 import './itemModal.css';
 
-const ItemModal = ({ isOpen, onClose, item, onStatusUpdate }) => {
+const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
+
     if (!isOpen || !item) return null;
 
-    // item.taskId contains the populated Task object
-    // item contains planner-specific data like time and date
     const task = item.taskId;
+    const isSubtask = !!item.subtaskId;
+
+    const dispatch = useDispatch();
+
+    const handleComplete = async () => {
+        if (isSubtask) {
+            console.log("Flipping subtask isCompleted");
+        } else {
+            await dispatch(updateTaskStatus({ id: task._id, status: 'Completed' }));
+        }
+        onClose();
+    };
+
+    const handleRemove = async () => {
+        await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
+        
+        if (!isSubtask) {
+            await dispatch(updateTaskStatus({ id: task._id, status: 'On-Hold' }));
+        }
+        onClose();
+    };
+
+    const handleShelve = async () => {
+        await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
+        
+        if (!isSubtask) {
+            await dispatch(updateTaskStatus({ id: task._id, status: 'Shelved' }));
+        }
+        onClose();
+    };
+
+    // Helper to format the date string passed from Dashboard
+    const formatFullDate = (dateStr) => {
+        if (!dateStr) return "";
+        const options = { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' };
+        return new Date(dateStr).toLocaleDateString('en-US', options);
+    };
 
     return (
         <div className="modal-overlay">
             <div className="item-modal-content">
                 <header className="modal-header">
-                    <div className="modal-logo"><img src={Logo} style={{height: '2.5rem'}}/> Scheduler</div>
-                    <button className="close-btn" onClick={onClose}><X size={20} strokeWidth={2} /></button>
+                    <div className="modal-logo">
+                        <img src={Logo} alt="Logo" style={{height: '2.5rem'}}/> 
+                        Scheduler
+                    </div>
+                    <button className="close-btn" onClick={onClose}>
+                        <X size={20} strokeWidth={2} />
+                    </button>
                 </header>
 
                 <div className="modal-body">
@@ -40,7 +83,8 @@ const ItemModal = ({ isOpen, onClose, item, onStatusUpdate }) => {
                     <div className="time-info-row">
                         <div className="time-pill">
                             <Calendar size={16} />
-                            <span>{item.date}</span>
+                            {/* Display the formatted date here */}
+                            <span>{formatFullDate(item.date)}</span>
                         </div>
                         <div className="time-pill">
                             <Clock size={16} />
@@ -64,24 +108,18 @@ const ItemModal = ({ isOpen, onClose, item, onStatusUpdate }) => {
                     </div>
 
                     <div className="action-footer">
-                        <button 
-                            className="btn-action complete" 
-                            onClick={() => onStatusUpdate(item._id, 'Completed')}
-                        >
+                        <button className="btn-action complete" onClick={handleComplete}>
                             <CheckCircle2 size={16} /> Complete
                         </button>
-                        <button 
-                            className="btn-action shelve"
-                            onClick={() => onStatusUpdate(item._id, 'Shelved')}
-                        >
+                        
+                        <button className="btn-action shelve" onClick={handleShelve}>
                             <Archive size={16} /> Shelve
                         </button>
-                        <button 
-                            className="btn-action remove"
-                            onClick={() => onStatusUpdate(item._id, 'Removed')}
-                        >
+                        
+                        <button className="btn-action remove" onClick={handleRemove}>
                             <Trash2 size={16} /> Remove
                         </button>
+                        
                         <button className="btn-action cancel" onClick={onClose}>
                             Cancel
                         </button>

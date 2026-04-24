@@ -6,7 +6,6 @@ export const fetchPlannerByDate = createAsyncThunk(
     async (date, { rejectWithValue }) => {
         try {
             const response = await API.get(`/planner/${date}`);
-            console.log(response.data);
             return response.data;
         }catch(error) {
             return rejectWithValue(error.response.data);
@@ -26,6 +25,19 @@ export const assignTaskToDate = createAsyncThunk(
             });
             return response.data;
         } catch(error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const removeTaskFromPlanner = createAsyncThunk(
+    'planner/removeTask',
+    async ({ date, entryId }, { rejectWithValue }) => {
+        try {
+            // Assuming your backend route is DELETE /planner/:date/:entryId
+            await API.delete(`/planner/${date}/${entryId}`);
+            return entryId;
+        } catch (error) {
             return rejectWithValue(error.response.data);
         }
     }
@@ -68,7 +80,10 @@ const plannerSlice = createSlice({
             .addCase(assignTaskToDate.rejected, (state, action) => {
                 state.scheduling = false;
                 state.error = action.payload?.message;
-            });
+            })
+            .addCase(removeTaskFromPlanner.fulfilled, (state, action) => {
+            state.dayData.tasks = state.dayData.tasks.filter(t => t._id !== action.payload);
+            })
     }
 })
 

@@ -35,7 +35,7 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
                     <button className="close-btn" onClick={onClose}><X size={20} strokeWidth={2} /></button>
                 </header>
 
-                <div className="modal-body">
+                <div className="session-modal-body">
                     <span className="label-input">Set Timer</span>
 
                     <div className="main-timer-display">
@@ -50,7 +50,7 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
                         <TimeUnit label="Seconds" value={seconds} onAdj={(amount) => adjustUnit('s', amount)} />
                     </div>
 
-                    <div className="slider-containe">
+                    <div className="slider-container">
                         <input
                             type="range"
                             min="0"
@@ -70,14 +70,14 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
                     </div>
                 </div>
 
-                <footer className="modal-footer">
+                <footer className="session-modal-footer">
                     <div className="footer-actions">
+                        <button className="btn-cancel" onClick={onClose}>Cancel</button>
                         <button className="btn-start" onClick={() => onStart(totalSeconds)}>
                             <Play size={20} strokeWidth={2} fill="currentColor" /> Start Session
                         </button>
-                        <button className="btn-cancel" onClick={onClose}>Cancel</button>
                     </div>
-                    <div className="footer info">
+                    <div className="footer-info">
                         <Info size={20} strokeWidth={2} />
                         <p>Timer countdown will begin upon 'Start Session'</p>
                     </div>

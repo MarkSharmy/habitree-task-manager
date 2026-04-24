@@ -29,8 +29,6 @@ exports.addTaskToPlanner = async (req, res) => {
         const { taskId, subtaskId, time, comments } = req.body;
         const userId = req.user.id;
 
-        console.log('Data:', { taskId, subtaskId, time, comments});
-
         // Validation: Don't allow null taskId
         if (!taskId) {
             return res.status(400).json({ success: false, message: "taskId is required" });
@@ -59,5 +57,44 @@ exports.addTaskToPlanner = async (req, res) => {
         res.status(201).json(updatedPlanner);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// @desc    Remove an entry from the planner tasks array
+// @route   DELETE /api/planner/:date/:id
+exports.deletePlannerTask = async (req, res) => {
+    try {
+        // Change 'entryId' to 'id' to match the route parameter /:date/:id
+        const { date, id } = req.params; 
+        const userId = req.user.id;
+
+        const planner = await Planner.findOneAndUpdate(
+            { userId, date },
+            { 
+                $pull: { tasks: { _id: id } } // Use 'id' here
+            },
+            { new: true } 
+        ).populate({
+            path: 'tasks.taskId',
+            populate: { path: 'groupId', select: 'name color' }
+        });
+
+        if (!planner) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Planner not found for this date" 
+            });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Item removed from planner",
+            planner 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            message: error.message 
+        });
     }
 };

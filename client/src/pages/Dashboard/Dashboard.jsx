@@ -48,7 +48,10 @@ const Dashboard = () => {
     };
 
     const handleItemClick = (entry) => {
-        setSelectedPlannerItem(entry);
+        setSelectedPlannerItem({
+            ...entry,
+            date: activeDate 
+        });
         setIsItemModalOpen(true);
     };
 
@@ -105,19 +108,30 @@ const Dashboard = () => {
                             </button>
                         </div>
                         <div className="task-list">
-                            {dayData?.tasks?.map((entry) => (
-                                <div 
-                                    key={entry._id} 
-                                    onClick={() => handleItemClick(entry)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <PlannerItem 
-                                        item={entry.taskId} 
-                                        scheduledTime={entry.time} 
-                                        specificSubtaskId={entry.subtaskId}
-                                    />
+                            {dayData?.tasks?.length > 0 ? (
+                                dayData.tasks.map((entry) => (
+                                    <div 
+                                        key={entry._id} 
+                                        onClick={() => handleItemClick(entry)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <PlannerItem 
+                                            item={entry.taskId} 
+                                            scheduledTime={entry.time} 
+                                            specificSubtaskId={entry.subtaskId}
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="empty-planner-state">
+                                    <div className="empty-icon-container">
+                                        <Calendar size={48} strokeWidth={1} />
+                                    </div>
+                                    <p>Your schedule is clear for today.</p>
+                                    <small>Add tasks from your inventory or use "Quick Add" to get started.</small>
                                 </div>
-                            ))}
+                            )
+                        }
                         </div>
                     </div>
                 </section>
@@ -158,9 +172,20 @@ const Dashboard = () => {
             <SessionModal
                 isOpen={isActiveModalOpen}
                 initialSeconds={sessionTime}
-                onFinish={(data) => {
-                    dispatch(saveWorkSession(data));
-                    setActiveModalOpen(false);
+                onFinish={async (data) => {
+                    try {
+                        // 1. Dispatch the save and wait for it to resolve
+                        await dispatch(saveWorkSession(data)).unwrap();
+                        
+                        // 2. Refresh stats and planner so the UI updates immediately
+                        dispatch(fetchTodayStats());
+                        dispatch(fetchPlannerByDate(activeDate));
+                        
+                        // 3. Only now close the modal
+                        setActiveModalOpen(false);
+                    } catch (err) {
+                        console.error("Failed to save session:", err);
+                    }
                 }}
                 onClose={() => setActiveModalOpen(false)}
             />
@@ -169,6 +194,7 @@ const Dashboard = () => {
                 isOpen={isItemModalOpen}
                 onClose={() => setIsItemModalOpen(false)}
                 item={selectedPlannerItem}
+                activeDate={activeDate} // Add this line
                 onStatusUpdate={handleStatusUpdate}
             />
         </div>

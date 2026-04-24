@@ -49,6 +49,18 @@ export const updateTaskAction = createAsyncThunk(
     }
 );
 
+export const updateTaskStatus = createAsyncThunk(
+    'tasks/updateStatus',
+    async ({ id, status }, { rejectWithValue }) => {
+        try {
+            const response = await API.patch(`/tasks/${id}/status`, { status });
+            return response.data.task;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
 export const deleteTask = createAsyncThunk(
     'tasks/delete',
     async (id) => {
