@@ -16,6 +16,7 @@ import {
     LogOut
 } from 'lucide-react';
 import Logo from '../assets/logo.png';
+import Avatar from '../assets/profile.png';
 import './mainlayout.css';
 
 const MainLayout = () => {
@@ -88,7 +89,7 @@ const MainLayout = () => {
                             <span className="dot"></span>
                         </div>
                         <div className="user-profile">
-                            <img src="/avatar-placeholder.jpg" alt="User" className="avatar" />
+                            <img src={Avatar} alt="User" className="avatar" style={{ height: '2rem'}}/>
                             <div className="user-text">
                                 <span className="user-name">Mark Sharmy</span>
                                 <span className="user-rank">Master</span>

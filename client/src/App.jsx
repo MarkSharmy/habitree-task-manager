@@ -9,6 +9,8 @@ import TaskInventory from './pages/TaskInventory/TaskInventory';
 import NotFound from './pages/NotFound/NotFound';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import TaskDetails from './pages/TaskDetails/TaskDetails';
+import ProjectManager from './pages/ProjectManager/ProjectManager';
+import ProjectKanban from './pages/ProjectKanban/ProjectKanban';
 
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tasks" element={<TaskInventory />} />
           <Route path="/tasks/:id" element={<TaskDetails />} />
+          <Route path="/projects/" element={<ProjectManager />} />
+          <Route path="/projects/:id" element={<ProjectKanban />} />
         </Route>
 
         {/* Redirect unknown routes */}

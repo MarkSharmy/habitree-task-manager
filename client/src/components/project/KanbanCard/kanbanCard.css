@@ -1,0 +1,94 @@
+.kanban-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Space between title and footer */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease;
+    cursor: grab;
+}
+
+.kanban-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.kanban-card:active {
+    cursor: grabbing;
+}
+
+.kanban-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.task-title {
+    font-size: 0.813rem;
+    font-weight: 500;
+    color: #334155;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.card-action-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0.125rem;
+    border-radius: 0.25rem;
+    flex-shrink: 0;
+}
+
+.card-action-btn:hover {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+/* Footer Section */
+.kanban-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-assignee {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.assignee-avatar, .assignee-placeholder {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.assignee-placeholder {
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+}
+
+.assignee-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.task-date {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #3b82f6; /* Blue as seen in your screenshot */
+    background: #eff6ff;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+}

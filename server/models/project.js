@@ -1,27 +1,36 @@
+// models/project.js
 const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    description: { type: String },
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
-    collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
+    description: { type: String, default: "No Description" },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    techStack: [{ type: String }], 
+    progress: { type: Number, default: 0 },
 
-    //The Kanban structure
     kanban: {
-        backendBacklog: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        frontendBacklog: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        mobileBacklog: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        design: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        todo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        doing: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        testing: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        done: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        blocked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        onHold: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-        trash: [{ type: mongoose.Schema.Types.ObjectId, ref: 'task' }],
-    },
-    createdAt: { type: Date, default: Date.now }
+        backendBacklog: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        frontendBacklog: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        mobileBacklog: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        design: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        todo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        doing: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        testing: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        done: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        blocked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        onHold: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        trash: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+    }
+}, { 
+    timestamps: true,
+    toJSON: { virtuals: true }, 
+    toObject: { virtuals: true } 
+});
+
+projectSchema.virtual('formattedDate').get(function() {
+    const d = this.createdAt;
+    return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
 });
 
 module.exports = mongoose.model('Project', projectSchema);
-

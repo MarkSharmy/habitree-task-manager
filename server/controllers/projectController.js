@@ -2,7 +2,6 @@ const Project = require('../models/project');
 const Task = require('../models/task');
 const User = require('../models/user');
 const Session = require('../models/session');
-const { startSession } = require('./sessionController');
 const Notification = require('../models/notification');
 const sendEmail = require('../utils/sendEmail');
 
@@ -10,30 +9,38 @@ const sendEmail = require('../utils/sendEmail');
 // @route   POST /api/projects
 exports.createProject = async(req, res) => {
     try {
-        const { name, description, collaborators } = req.body;
+        const { name, description, collaborators, techStack } = req.body;
+        
         const project = await Project.create({
             name,
-            description,
+            description: description || "No Description",
             owner: req.user.id,
-            collaborators
+            collaborators: collaborators || [],
+            techStack: techStack || [],
+            progress: 0 
         });
-        res.status(201).json({success: true, project});
 
+        res.status(201).json({ success: true, project });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 // @desc    Get project matching ID
 // @route   GET /api/projects/:id
 exports.getSingleProject = async (req, res) => {
     try {
-        const projectId = await Project.findById(req.params.id);
-        if(!project) return res.status(404).json({ success: false, message: "Project not found" });
+        const project = await Project.findById(req.params.id)
+            .populate({
+                path: 'kanban.backendBacklog kanban.frontendBacklog kanban.mobileBacklog kanban.design kanban.todo kanban.doing kanban.testing kanban.done',
+                populate: { path: 'assignee', select: 'username avatar' }
+            });
+
+        if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
         res.json({ success: true, project });
-
     } catch (error) {
+        console.log(error.message);
         res.status(500).json({ success: false, message: error.message });
     }
 }
@@ -41,17 +48,18 @@ exports.getSingleProject = async (req, res) => {
 // @desc    Get all projects user is part of (Owner or Collaborator)
 // @route   GET /api/projects
 exports.getProjects = async (req, res) => {
-    try{
+    try {
         const projects = await Project.find({
             $or: [{ owner: req.user.id }, { collaborators: req.user.id }]
-        }).populate('owner', 'username email');
+        })
+        .populate('owner', 'username email avatar')
+        .populate('collaborators', 'username avatar');
 
-        res.json({ success: true, projects});
-
-    }catch(error) {
-        res.status(500).json({success: false, message: error.message });
+        res.json({ success: true, projects });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 // @desc    Update project details
 // @route   PUT /api/projects/:id
@@ -82,8 +90,6 @@ exports.deleteProject = async (req, res) => {
             return res.status(404).json({ success: false, message: "Project not found" });
         }
 
-        // Optional: Delete all tasks that were part of this project's Kanban board
-        // This keeps your 'tasks' collection from getting cluttered with dead data
         const allTasksIds = Object.values(project.kanban).flat();
         await Task.deleteMany({ _id: { $in: allTasksIds }});
 
