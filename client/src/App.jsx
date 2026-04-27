@@ -7,6 +7,7 @@ import RegisterPage from './pages/Auth/RegisterPage';
 import TaskInventory from './pages/TaskInventory/TaskInventory';
 
 import NotFound from './pages/NotFound/NotFound';
+import ServerError from './pages/Error/ServerError';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import TaskDetails from './pages/TaskDetails/TaskDetails';
 import ProjectManager from './pages/ProjectManager/ProjectManager';
@@ -31,6 +32,9 @@ function App() {
           <Route path="/projects/" element={<ProjectManager />} />
           <Route path="/projects/:id" element={<ProjectKanban />} />
         </Route>
+
+        {/* Internal server error */}
+        <Route path="/server-error" element={<ServerError />} />
 
         {/* Redirect unknown routes */}
         <Route path="*" element={<NotFound />} />

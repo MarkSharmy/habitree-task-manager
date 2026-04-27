@@ -57,24 +57,39 @@ exports.getTaskById = async (req, res) => {
 // @desc    Get all tasks grouped by their user-defined Groups
 // @route   GET /api/tasks
 exports.getGroupedTasks = async (req, res) => {
-    
-    //fetch all the groups for the user
-    const groups = await Group.find({ userId: req.user.id });
+    try {
+        // 1. Fetch all groups for the user
+        const groups = await Group.find({ userId: req.user.id });
 
-    //fetch all tasks for this user
-    const tasks = await Task.find({ userId: req.user.id }).populate('groupId');
+        // 2. Fetch tasks where projectId is null/undefined
+        // This effectively excludes any tasks belonging to PermitPrep projects
+        const tasks = await Task.find({ 
+            userId: req.user.id,
+            $or: [
+                { projectId: { $exists: false } },
+                { projectId: null }
+            ]
+        }).populate('groupId');
 
-    //Organize tasks into a map where key is Group name
-    const organized = { "Uncategorized": [] };
-    groups.forEach(g => organized[g.name] = []);
+        // 3. Organize tasks into a map
+        const organized = { "Uncategorized": [] };
+        groups.forEach(g => organized[g.name] = []);
 
-    tasks.forEach(task => {
-        const groupName = task.groupId ? task.groupId.name : "Uncategorized";
-        if (!organized[groupName]) organized[groupName] = [];
-        organized[groupName].push(task);
-    });
+        tasks.forEach(task => {
+            const groupName = task.groupId ? task.groupId.name : "Uncategorized";
+            
+            // Safety check in case a group was deleted but the task still has the ID
+            if (!organized[groupName]) {
+                organized["Uncategorized"].push(task);
+            } else {
+                organized[groupName].push(task);
+            }
+        });
 
-    res.json(organized);
+        res.json(organized);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 }
 
 // @desc    Update task (Status, Subtasks, Time Tracking)
@@ -158,13 +173,13 @@ exports.updateTaskStatus = async (req, res) => {
             { new: true }
         );
 
-        if(!task) return res.status(404).json({ success: false, message: "Task not found" });
+        if (!task) return res.status(404).json({ success: false, message: "Task not found" });
 
-        if(task.projectId) {
+        if (task.projectId) {
             const project = await Project.findById(task.projectId);
 
             if (project) {
-                // 1. Remove from all existing columns
+                // 1. Remove from all existing columns to avoid duplicates
                 Object.keys(project.kanban).forEach(col => {
                     if (Array.isArray(project.kanban[col])) {
                         project.kanban[col] = project.kanban[col].filter(id => id.toString() !== task._id.toString());
@@ -180,12 +195,14 @@ exports.updateTaskStatus = async (req, res) => {
                     case 'On-Going':
                         targetColumn = 'doing';
                         break;
-                    case 'Shelved':
+                    case 'Shelved': // Matches handleShelve
                     case 'Not Started':
                         targetColumn = 'todo';
                         break;
                     default:
-                        return res.status(400).json({ success: false, message: "Invalid Status" });
+                        // If status is something else (like 'On-Hold'), 
+                        // you might want to pick a default or skip moving
+                        targetColumn = 'todo'; 
                 }
             
                 project.kanban[targetColumn].push(task._id);

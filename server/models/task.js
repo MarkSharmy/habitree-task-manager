@@ -30,7 +30,15 @@ const TaskSchema = new mongoose.Schema({
         enum: ['Not Started', 'On-Going', 'Completed', 'Shelved'],
         default: 'Not Started'
     },
-    subtasks: [SubtaskSchema],
+    kanban: {
+        type: String,
+        enum: [
+            'Todo', 'Doing', 'Done', 'Testing',
+            'backendBacklog', 'frontendBacklog', 'mobileBacklog', 'design'
+        ],
+        default: 'Todo'
+    },
+    subtasks: [SubtaskSchema]
 
 }, { timestamps: true });
 

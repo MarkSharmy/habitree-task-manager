@@ -19,9 +19,13 @@ const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
 
     const handleComplete = async () => {
         if (isSubtask) {
+            // Logic for subtasks if needed
             console.log("Flipping subtask isCompleted");
         } else {
+            // This triggers the backend to move task to 'done' column
             await dispatch(updateTaskStatus({ id: task._id, status: 'Completed' }));
+            // Also remove from today's planner since it is finished
+            await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
         }
         onClose();
     };
@@ -36,8 +40,10 @@ const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
     };
 
     const handleShelve = async () => {
+        // 1. Remove from the visual planner for the active date
         await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
         
+        // 2. Update status to 'Shelved' which the backend maps to 'todo'
         if (!isSubtask) {
             await dispatch(updateTaskStatus({ id: task._id, status: 'Shelved' }));
         }

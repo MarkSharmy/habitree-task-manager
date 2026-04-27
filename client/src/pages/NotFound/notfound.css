@@ -1,0 +1,80 @@
+.not-found-wrapper {
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+.not-found-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3.125rem; /* rem based gap spacing (~50px) */
+    max-width: 60rem; /* (~960px) limits stretching */
+}
+
+/* Header Text (OOPS! and Page not found) */
+.not-found-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.oops-text {
+    font-size: 2.25rem; /* rem based scaling (~36px) */
+    font-weight: 700;
+    color: #1a73e8; /* Design's blue color */
+    margin: 0;
+    letter-spacing: 0.05em;
+}
+
+.page-not-found-text {
+    font-size: 1rem; /* rem based (~16px) */
+    font-weight: 400;
+    color: #8c8c8c; /* Design's grey color */
+    margin: 0;
+}
+
+/* Illustration */
+.illustration-container {
+    display: flex;
+    justify-content: center;
+    max-width: 100%;
+}
+
+.not-found-img {
+    max-width: 100%;
+    height: 15rem;
+    object-fit: contain;
+}
+
+/* Footer & Button (Green style from design) */
+.not-found-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.btn-back-dashboard {
+    background-color: #69b84e; /* Design's green color */
+    color: #ffffff;
+    font-size: 0.8125rem; /* rem based (~13px) */
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 2rem; /* highly rounded corners */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-back-dashboard:hover {
+    background-color: #5aa142; /* Slightly darker hover state */
+}
+
+.btn-back-dashboard:active {
+    transform: scale(0.98); /* small click feedback */
+}

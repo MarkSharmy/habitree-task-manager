@@ -26,11 +26,11 @@
     cursor: pointer;
 }
 
-.progress-container {
+.stat-progress-container {
     padding: 1rem 0;
 }
 
-.circular-progress {
+.stat-circular-progress {
     width: 5rem;
     height: 5rem;
     border-radius: 50%;
@@ -41,7 +41,7 @@
     transition: background 0.5s ease;
 }
 
-.inner-circle {
+.stat-inner-circle {
     width: 4rem;
     height: 4rem;
     background: #fff;

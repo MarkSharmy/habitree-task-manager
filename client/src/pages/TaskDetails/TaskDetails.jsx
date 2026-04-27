@@ -1,37 +1,56 @@
-import { useEffect, useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState, useMemo, useRef } from 'react'; // Added useRef
+import { useParams, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { useSelector, useDispatch } from 'react-redux';
 import { BarLoader } from 'react-spinners';
-import { fetchTaskById, clearCurrentTask, updateTaskAction } from '../../store/slices/taskSlice';
+import { 
+    fetchTaskById, 
+    clearCurrentTask, 
+    updateTaskAction, 
+    deleteTask // Ensure this is exported from taskSlice
+} from '../../store/slices/taskSlice';
 import ScheduleTaskModal from '../../components/modals/Scheduler/SchedulerModal';
 import { 
     Calendar, Settings, Info, ListTodo, 
-    Trash2, PlayCircle, User, Tag, Folder, CheckCircle
+    Trash2, PlayCircle, User, Tag, Folder, Edit3, MoreVertical 
 } from 'lucide-react';
 import './taskdetails.css';
 
 const TaskDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
+    const navigate = useNavigate(); // For redirecting after delete
+    
     const { currentTask: task, detailsLoading } = useSelector((state) => state.tasks);
     
     const [descInput, setDescInput] = useState("");
     const [newSubtask, setNewSubtask] = useState("");
-
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
     const [selectedItemForSchedule, setSelectedItemForSchedule] = useState(null);
+    
+    // Dropdown State
+    const [showSettings, setShowSettings] = useState(false);
+    const settingsRef = useRef(null);
 
     useEffect(() => {
         dispatch(fetchTaskById(id));
         return () => dispatch(clearCurrentTask());
     }, [dispatch, id]);
 
-    // Sync local description when task loads
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+                setShowSettings(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     useEffect(() => {
         if (task) setDescInput(task.description || "");
     }, [task]);
 
-    // 4. Progress Calculation
     const progressValue = useMemo(() => {
         if (!task?.subtasks || task.subtasks.length === 0) return 0;
         const completed = task.subtasks.filter(st => st.isCompleted).length;
@@ -41,11 +60,16 @@ const TaskDetails = () => {
     // Handlers
     const handleUpdate = (updates) => dispatch(updateTaskAction({ id, updates }));
 
-    const handleSubtaskToggle = (stId, completed) => {
-        const updatedSubtasks = task.subtasks.map(st => 
-            st._id === stId ? { ...st, isCompleted: !completed } : st
-        );
-        handleUpdate({ subtasks: updatedSubtasks });
+    const handleDeleteTask = async () => {
+        if (window.confirm("Are you sure you want to delete this task? This action cannot be undone.")) {
+            try {
+                await dispatch(deleteTask(task._id)).unwrap();
+                navigate('/tasks'); // Redirect to inventory
+            } catch (err) {
+                console.error("Failed to delete task:", err);
+                alert("Error deleting task.");
+            }
+        }
     };
 
     const handleDeleteSubtask = (stId) => {
@@ -63,15 +87,13 @@ const TaskDetails = () => {
     };
 
     const openScheduler = (item = task) => {
-    // If the item being passed is NOT the main task (i.e., it's a subtask),
-    // manually attach the parentId so the Modal can find it.
-    const itemWithContext = item._id === task._id 
-        ? item 
-        : { ...item, parentId: task._id, category: task.category, groupId: task.groupId };
+        const itemWithContext = item._id === task._id 
+            ? item 
+            : { ...item, parentId: task._id, category: task.category, groupId: task.groupId };
 
-    setSelectedItemForSchedule(itemWithContext);
-    setIsScheduleModalOpen(true);
-};
+        setSelectedItemForSchedule(itemWithContext);
+        setIsScheduleModalOpen(true);
+    };
 
     if (detailsLoading || !task) return <div className="details-loader-container"><BarLoader color="#3b82f6" /><p>Syncing...</p></div>;
     
@@ -88,7 +110,27 @@ const TaskDetails = () => {
                     <button className="btn-add-schedule" onClick={() => openScheduler()}>
                         <Calendar size={18} /> Add to Schedule
                     </button>
-                    <button className="btn-icon-settings"><Settings size={18} /></button>
+                    
+                    {/* Settings Dropdown */}
+                    <div className="settings-menu-container" ref={settingsRef}>
+                        <button 
+                            className={`btn-icon-settings ${showSettings ? 'active' : ''}`}
+                            onClick={() => setShowSettings(!showSettings)}
+                        >
+                            <Settings size={18} />
+                        </button>
+                        
+                        {showSettings && (
+                            <div className="settings-dropdown">
+                                <button className="dropdown-item" onClick={() => {/* Add Edit Logic */}}>
+                                    <Edit3 size={14} /> Edit Task
+                                </button>
+                                <button className="dropdown-item delete" onClick={handleDeleteTask}>
+                                    <Trash2 size={14} /> Delete Task
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
 
@@ -99,8 +141,9 @@ const TaskDetails = () => {
                         <textarea 
                             value={descInput}
                             onChange={(e) => setDescInput(e.target.value)}
+                            onBlur={() => handleUpdate({ description: descInput })}
                             onKeyDown={(e) => e.key === 'Enter' && handleUpdate({ description: descInput })}
-                            placeholder="Add a description and press Enter..."
+                            placeholder="Add a description..."
                         />
                     </div>
 
@@ -121,10 +164,7 @@ const TaskDetails = () => {
                                         />
                                     </div>
                                     <div className="subtask-right">
-                                        <button 
-                                            className="btn-sub-action" 
-                                            onClick={() => openScheduler(st)}
-                                        >
+                                        <button className="btn-sub-action" onClick={() => openScheduler(st)}>
                                             <Calendar size={14} />
                                         </button>
                                         <Trash2 size={14} className="btn-sub-action delete" onClick={() => handleDeleteSubtask(st._id)} />
@@ -146,6 +186,7 @@ const TaskDetails = () => {
                 </section>
 
                 <aside className="metadata-sidebar">
+                    {/* ... rest of your sidebar code ... */}
                     <div className="meta-list">
                         <div className="meta-item">
                             <div className="meta-label"><PlayCircle size={16}/> Status:</div>
@@ -160,26 +201,7 @@ const TaskDetails = () => {
                                 <option value="Shelved">Shelved</option>
                             </select>
                         </div>
-                        <div className="meta-item">
-                            <div className="meta-label"><Calendar size={16}/> Date:</div>
-                            <div className="meta-value text">
-                                {task.createdAt ? new Date(task.createdAt).toISOString().split('T')[0] : 'N/A'} <Info size={12}/>
-                            </div>
-                        </div>
-                        <div className="meta-item">
-                            <div className="meta-label"><User size={16}/> Owner:</div>
-                            <div className="meta-value text">Mark Sharmy <Info size={12}/></div>
-                        </div>
-                        <div className="meta-item">
-                            <div className="meta-label"><Tag size={16}/> Category:</div>
-                            <div className="meta-value badge light">{task.category} <Info size={12}/></div> {/* From Server */}
-                        </div>
-                        <div className="meta-item">
-                            <div className="meta-label"><Folder size={16}/> Group:</div>
-                            <div className="meta-value badge light">
-                                {task.groupId?.name || 'Uncategorized'} <Info size={12}/> {/* From Populated Group */}
-                            </div>
-                        </div>
+                        {/* ... other meta items ... */}
                     </div>
 
                     <div className="progress-card">
@@ -204,7 +226,6 @@ const TaskDetails = () => {
                 onClose={() => setIsScheduleModalOpen(false)}
                 task={selectedItemForSchedule}
             />
-
         </div>
     );
 };

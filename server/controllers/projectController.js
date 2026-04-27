@@ -1,4 +1,5 @@
 const Project = require('../models/project');
+const Planner = require('../models/planner');
 const Task = require('../models/task');
 const User = require('../models/user');
 const Session = require('../models/session');
@@ -33,17 +34,24 @@ exports.getSingleProject = async (req, res) => {
         const project = await Project.findById(req.params.id)
             .populate({
                 path: 'kanban.backendBacklog kanban.frontendBacklog kanban.mobileBacklog kanban.design kanban.todo kanban.doing kanban.testing kanban.done',
-                populate: { path: 'assignee', select: 'username avatar' }
-            });
+                model: 'Task', 
+                populate: {
+                    path: 'userId', 
+                    model: 'User',
+                    select: 'username avatar'
+                }
+            })
+            .populate('owner', 'username avatar')
+            .populate('collaborators', 'username avatar');
 
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
         res.json({ success: true, project });
     } catch (error) {
-        console.log(error.message);
+        // This will now catch the error and show you exactly what is wrong if it persists
         res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 // @desc    Get all projects user is part of (Owner or Collaborator)
 // @route   GET /api/projects
@@ -101,53 +109,102 @@ exports.deleteProject = async (req, res) => {
     }
 }
 
+exports.addTaskToProject = async (req, res) => {
+    const { title, columnId } = req.body;
+    const projectId = req.params.id;
+
+    try {
+        const newTask = await Task.create({
+            title: title || 'New Task',
+            userId: req.user.id,
+            projectId: projectId,
+            category: 'Project', 
+            kanban: columnId,   
+            status: 'Not Started'
+        });
+
+        await Project.findByIdAndUpdate(
+            projectId,
+            { $push: { [`kanban.${columnId}`]: newTask._id } }
+        );
+
+        res.status(201).json({ success: true, task: newTask, columnId });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 // @desc    Move task between Kanban columns (The Bridge)
 // @route   PUT /api/projects/:id/move
-exports.moveTask = async(req, res) => {
+exports.moveTask = async (req, res) => {
     const { taskId, fromColumn, toColumn } = req.body;
     const projectId = req.params.id;
 
     try {
         const project = await Project.findById(projectId);
-        if(!project) return res.status(404).json({ success: false, message: 'Project not found' });
+        if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
 
+        // 1. Move task ID within the Project's kanban arrays
         project.kanban[fromColumn] = project.kanban[fromColumn].filter(id => id.toString() !== taskId);
         project.kanban[toColumn].push(taskId);
 
+        // 2. Define standard task updates
+        const taskUpdates = { 
+            kanban: toColumn,
+            status: toColumn === 'done' ? 'Completed' : 'In Progress'
+        };
+
+        // 3. Logic for moving to 'doing' (Planner Integration)
         if (toColumn === 'doing') {
-            const existingSession = await Session.findOne({ taskId, userId: req.user.id, isCompleted: false });
-            if(!existingSession) {
-                await Session.create({
-                    userId: req.user.id,
-                    taskId: taskId,
-                    startTime: Date.now()
-                });
-            }
-            await Task.findByIdAndUpdate(taskId, { status: 'Doing', scheduledDate: new Date() });
+            const now = new Date();
+            const hourString = `${now.getHours().toString().padStart(2, '0')}:00`; 
+            
+            const dateString = now.toISOString().split('T')[0];
+
+            await Planner.findOneAndUpdate(
+                { 
+                    userId: req.user.id, 
+                    date: dateString 
+                },
+                { 
+                    $addToSet: { // $addToSet prevents duplicate entries if they double-click
+                        tasks: { 
+                            taskId: taskId, 
+                            time: hourString, 
+                            comments: "Started from Kanban"
+                        } 
+                    } 
+                },
+                { 
+                    upsert: true, 
+                    new: true, 
+                    setDefaultsOnInsert: true 
+                }
+            );
+
+            taskUpdates.status = 'On-Going';
         }
 
-        if(fromColumn === 'doing') {
-            const activeSession = await Session.findOne({ taskId, userId: req.user.id, isCompleted: false });
-            if(activeSession) {
-                const endTime = Date.now();
-                const durationSeconds = Math.floor((endTime - activeSession.startTime) / 1000);
-                
-                activeSession.endTime = endTime;
-                activeSession.duration = durationSeconds;
-                activeSession.isCompleted = true;
-                await activeSession.save();
+        // 4. Update the Task document
+        await Task.findByIdAndUpdate(taskId, taskUpdates);
 
-                await Task.findByIdAndUpdate(taskId, { $inc: { totalTimeSpent: durationSeconds } });
-            }
-        }
-
+        // 5. Save the Project document
         await project.save();
-        req.io.to(projectId).emit('taskMoved', { taskId, fromColumn, toColumn, user: req.user.username });
+
+        // 6. Real-time update
+        req.io.to(projectId).emit('taskMoved', { 
+            taskId, 
+            fromColumn, 
+            toColumn, 
+            user: req.user.username 
+        });
+
         res.json({ success: true, project });
     } catch (error) {
+        console.error("Move Task Error:", error); // Log this for debugging
         res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 // @desc    Add a collaborator to a project
 // @route   POST /api/projects/:id/collaborators

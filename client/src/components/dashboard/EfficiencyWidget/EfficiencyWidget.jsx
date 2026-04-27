@@ -13,14 +13,14 @@ const EfficiencyWidget = ({ score = 0}) => {
                 <Info size={16} strokeWidth={2} className="info-icon" />
             </div>
 
-            <div className="progress-container">
+            <div className="stat-progress-container">
                 <div
-                    className="circular-progress"
+                    className="stat-circular-progress"
                     style={{ 
                         background: `conic-gradient(#3498db ${rotation}deg, #ebf0f1 ${rotation}deg)` 
                     }}
                 >
-                    <div className="inner-circle">
+                    <div className="stat-inner-circle">
                         <span className="score-number">{score.toFixed(2)}</span>
                     </div>
                 </div>

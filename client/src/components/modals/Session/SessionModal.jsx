@@ -160,7 +160,7 @@ const SessionModal = ({ isOpen, initialSeconds, onClose, onFinish }) => {
                     )}
                 </div>
 
-                <footer className="session-modal-footer">
+                <footer className="session-footer-info">
                     <span><Info size={16} /></span>
                     <p>Session will be added to Today's Productivity</p>
                 </footer>

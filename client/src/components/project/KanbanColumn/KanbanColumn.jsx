@@ -1,9 +1,22 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { MoreHorizontal, Plus } from 'lucide-react';
+import { Droppable } from '@hello-pangea/dnd'; // Added
+import { addTaskToColumn } from '../../../store/slices/projectSlice';
 import KanbanCard from '../KanbanCard/KanbanCard';
 import './kanbanColumn.css';
 
 const KanbanColumn = ({ title, tasks, columnId }) => {
+    const { id: projectId } = useParams();
+    const dispatch = useDispatch();
+
+    const handleAddItem = () => {
+        if (projectId && columnId) {
+            dispatch(addTaskToColumn({ projectId, columnId }));
+        }
+    };
+
     return (
         <div className="kanban-column">
             <header className="column-header">
@@ -12,7 +25,7 @@ const KanbanColumn = ({ title, tasks, columnId }) => {
                     <span className="task-count">{tasks?.length || 0}</span>
                 </div>
                 <div className="header-actions">
-                    <button className="icon-btn-small">
+                    <button className="icon-btn-small" onClick={handleAddItem}>
                         <Plus size={16} />
                     </button>
                     <button className="icon-btn-small">
@@ -21,19 +34,20 @@ const KanbanColumn = ({ title, tasks, columnId }) => {
                 </div>
             </header>
 
-            <div className="task-list">
-                {tasks && tasks.length > 0 ? (
-                    tasks.map((task) => (
-                        <KanbanCard key={task._id} task={task} />
-                    ))
-                ) : null}
-
-                {/* The "Add Item" dashed placeholder from the UI */}
-                <div className="add-item-placeholder">
-                    <Plus size={18} />
-                    <span>Add Item</span>
-                </div>
-            </div>
+            <Droppable droppableId={columnId}>
+                {(provided, snapshot) => (
+                    <div 
+                        className={`task-list ${snapshot.isDraggingOver ? 'dragging-over' : ''}`}
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                    >
+                        {tasks?.map((task, index) => (
+                            <KanbanCard key={task._id} task={task} index={index} />
+                        ))}
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
         </div>
     );
 };

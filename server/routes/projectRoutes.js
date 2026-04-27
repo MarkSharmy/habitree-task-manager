@@ -8,6 +8,7 @@ const {
     getSingleProject,
     updateProject,
     deleteProject,
+    addTaskToProject,
     moveTask,
     inviteCollaborator,
     removeCollaborator,
@@ -36,6 +37,9 @@ router.route('/:id')
 
 // @route   PUT /api/projects/:id/move (The Bridge: Moves tasks + Starts/Stops Sessions)
 router.put('/:id/move', moveTask);
+
+// @route   POST /api/projects/:id/add-task 
+router.post('/:id/add-task', addTaskToProject);
 
 // @route   POST /api/projects/:id/invite (Email-based invitation + Notification)
 router.post('/:id/invite', inviteCollaborator);

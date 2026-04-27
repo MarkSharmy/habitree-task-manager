@@ -52,6 +52,12 @@
     font-size: 0.85rem;
 }
 
+.session-footer-info {
+    display: flex;
+    align-items: center;
+    justify-items: start;
+    gap: 1rem;
+}
 .sync-loading-container {
     height: 100%;
     width: 100%;

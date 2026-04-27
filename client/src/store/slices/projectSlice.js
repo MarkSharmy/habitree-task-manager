@@ -25,13 +25,73 @@ export const fetchProjects = createAsyncThunk(
     }
 );
 
-// NEW: Thunk to create a project
 export const createProject = createAsyncThunk(
     'projects/create',
     async (projectData, { rejectWithValue }) => {
         try {
             const response = await API.post('/projects', projectData);
             return response.data.project; 
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const addTaskToColumn = createAsyncThunk(
+    'projects/addTask',
+    async ({ projectId, columnId }, { rejectWithValue }) => {
+        try {
+            const response = await API.post(`/projects/${projectId}/add-task`, {
+                columnId: columnId,
+                title: "New Task" 
+            });
+
+            return { 
+                newTask: response.data.task, 
+                columnId: columnId 
+            };
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const updateTask = createAsyncThunk(
+    'projects/updateTask',
+    async ({ taskId, updates }, { rejectWithValue }) => {
+        try {
+            const response = await API.put(`/tasks/${taskId}`, updates);
+            // Check your backend: Is it response.data.task or just response.data?
+            return response.data.task || response.data; 
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const deleteTask = createAsyncThunk(
+    'projects/deleteTask',
+    async ({ taskId, projectId, columnId }, { rejectWithValue }) => {
+        try {
+            await API.delete(`/tasks/${taskId}`); // Adjust endpoint as needed
+            return { taskId, columnId };
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const moveTaskBetweenColumns = createAsyncThunk(
+    'projects/moveTask',
+    async ({ projectId, taskId, fromColumn, toColumn }, { rejectWithValue }) => {
+        try {
+            const response = await API.put(`/projects/${projectId}/move`, {
+                taskId,
+                fromColumn,
+                toColumn
+            });
+
+            return { taskId, fromColumn, toColumn, project: response.data.project };
         } catch (error) {
             return rejectWithValue(error.response.data);
         }
@@ -46,6 +106,7 @@ const projectSlice = createSlice({
         loading: false,
         error: null,
         createLoading: false, 
+        moveLoading: false,
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -82,6 +143,76 @@ const projectSlice = createSlice({
             })
             .addCase(createProject.rejected, (state, action) => {
                 state.createLoading = false;
+                state.error = action.payload?.message;
+            })
+            .addCase(addTaskToColumn.pending, (state) => {
+                // Optional: add a small loading state if you want to disable 
+                // the "Add Item" button while it saves
+            })
+            .addCase(addTaskToColumn.fulfilled, (state, action) => {
+                const { newTask, columnId } = action.payload;
+                
+                // Ensure currentProject is loaded before pushing
+                if (state.currentProject && state.currentProject.kanban[columnId]) {
+                    state.currentProject.kanban[columnId].push(newTask);
+                }
+            })
+            .addCase(addTaskToColumn.rejected, (state, action) => {
+                state.error = action.payload?.message || "Failed to add task";
+            })
+            .addCase(updateTask.fulfilled, (state, action) => {
+                const updatedTask = action.payload;
+                
+                // If the server failed to send the task back, stop here
+                if (!updatedTask) {
+                    console.error("Update successful, but no task data returned from server.");
+                    return;
+                }
+
+                const columnId = updatedTask.kanban; 
+
+                // Check if the project, the kanban object, and the specific column exist
+                if (state.currentProject?.kanban?.[columnId]) {
+                    const index = state.currentProject.kanban[columnId].findIndex(t => t._id === updatedTask._id);
+                    if (index !== -1) {
+                        state.currentProject.kanban[columnId][index] = updatedTask;
+                    }
+                } else {
+                    console.warn(`Column "${columnId}" not found in currentProject state.`);
+                }
+            })
+            .addCase(deleteTask.fulfilled, (state, action) => {
+                const { taskId, columnId } = action.payload;
+                if (state.currentProject) {
+                    state.currentProject.kanban[columnId] = state.currentProject.kanban[columnId].filter(
+                        t => t._id !== taskId
+                    );
+                }
+            })
+            .addCase(moveTaskBetweenColumns.pending, (state) => {
+                state.moveLoading = true;
+            })
+            .addCase(moveTaskBetweenColumns.fulfilled, (state, action) => {
+                state.moveLoading = false; // Reset loading
+                const { taskId, fromColumn, toColumn } = action.payload;
+
+                if (state.currentProject) {
+                    const taskToMove = state.currentProject.kanban[fromColumn].find(t => t._id === taskId);
+                    if (taskToMove) {
+                        state.currentProject.kanban[fromColumn] = state.currentProject.kanban[fromColumn]
+                            .filter(t => t._id !== taskId);
+                        
+                        state.currentProject.kanban[toColumn].push({
+                            ...taskToMove,
+                            kanban: toColumn,
+                            // Ensure status is updated locally if needed
+                            status: toColumn === 'done' ? 'Completed' : toColumn === 'doing' ? 'On-Going' : 'In Progress'
+                        });
+                    }
+                }
+            })
+            .addCase(moveTaskBetweenColumns.rejected, (state, action) => {
+                state.moveLoading = false;
                 state.error = action.payload?.message;
             });
     }
