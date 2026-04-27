@@ -1,6 +1,6 @@
 .kanban-card {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--grey-bd);
     border-radius: 0.5rem;
     padding: 1rem;
     display: flex;
@@ -24,6 +24,8 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    max-height: 4rem;
+    overflow: hidden;
     gap: 0.5rem;
 }
 
@@ -79,8 +81,8 @@
 }
 
 .assignee-name {
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.6rem;
+    font-weight: 400;
     color: #64748b;
 }
 
