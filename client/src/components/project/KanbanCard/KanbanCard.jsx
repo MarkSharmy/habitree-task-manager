@@ -1,18 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { MoreHorizontal, User, Check, X } from 'lucide-react';
-import { Draggable } from '@hello-pangea/dnd'; // Added
+import { Snackbar, Alert } from '@mui/material';
+import { MoreHorizontal, User, Check, X, Copy } from 'lucide-react'; // Added Copy icon
+import { Draggable } from '@hello-pangea/dnd';
 import { updateTask, deleteTask, moveTaskBetweenColumns } from '../../../store/slices/projectSlice';
 import MoveCardModal from '../../modals/Project/MoveCardModal';
 import './kanbanCard.css';
 
-const KanbanCard = ({ task, index }) => { // Added index prop
+const KanbanCard = ({ task, index }) => {
     const menuRef = useRef(null);
     const dispatch = useDispatch();
     const [showOptions, setShowOptions] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editedTitle, setEditedTitle] = useState(task.title);
     const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    
+    const handleCopy = () => {
+        navigator.clipboard.writeText(task.title)
+            .then(() => {
+                setSnackbarOpen(true); // Trigger feedback
+                setShowOptions(false);
+            });
+    };
 
     const handleMoveTask = (taskId, sourceColumn, targetColumn) => {
         if (sourceColumn !== targetColumn) {
@@ -91,8 +101,9 @@ const KanbanCard = ({ task, index }) => { // Added index prop
                             {showOptions && (
                                 <div className="card-options-menu">
                                     <button className="menu-item" onClick={() => { setIsEditing(true); setShowOptions(false); }}>EDIT</button>
-                                    <button className="menu-item delete-item" onClick={handleDelete}>DELETE</button>
+                                    <button className="menu-item" onClick={handleCopy}>COPY</button> {/* Added Copy Button */}
                                     <button className="menu-item" onClick={() => { setIsMoveModalOpen(true); setShowOptions(false); }}>MOVE</button>
+                                    <button className="menu-item delete-item" onClick={handleDelete}>DELETE</button>
                                 </div>
                             )}
                         </div>
@@ -117,6 +128,16 @@ const KanbanCard = ({ task, index }) => { // Added index prop
                         onMove={handleMoveTask}
                         columnKeys={['backendBacklog', 'frontendBacklog', 'mobileBacklog', 'design', 'todo', 'doing', 'testing', 'done']}
                     />
+                    <Snackbar 
+                        open={snackbarOpen} 
+                        autoHideDuration={2000} 
+                        onClose={() => setSnackbarOpen(false)}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    >
+                        <Alert severity="success" sx={{ width: '100%' }}>
+                            Title copied to clipboard!
+                        </Alert>
+                    </Snackbar>
                 </div>
             )}
         </Draggable>
