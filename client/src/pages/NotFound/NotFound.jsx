@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import NotFoundIllustration from '../../assets/404.png'; // Make sure this asset exists
-import './notFound.css';
+import './notfound.css';
 
 const NotFound = () => {
     const navigate = useNavigate();
