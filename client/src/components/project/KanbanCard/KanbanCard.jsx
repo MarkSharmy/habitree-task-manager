@@ -65,7 +65,7 @@ const KanbanCard = ({ task, index }) => { // Added index prop
                     {...provided.dragHandleProps}
                     style={{ ...provided.draggableProps.style }}
                 >
-                    <div className="kanban-card-header">
+                    <div className={`kanban-card-header ${showOptions ? 'extend' : 'shrink'}`}>
                         {isEditing ? (
                             <div className="edit-mode-container">
                                 <input 

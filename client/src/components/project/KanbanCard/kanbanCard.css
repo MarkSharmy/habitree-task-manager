@@ -24,9 +24,12 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.kanban-card-header.shrink {
     max-height: 4rem;
     overflow: hidden;
-    gap: 0.5rem;
 }
 
 .task-title {
