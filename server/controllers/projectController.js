@@ -11,14 +11,14 @@ const sendEmail = require('../utils/sendEmail');
 exports.createProject = async(req, res) => {
     try {
         const { name, description, collaborators, techStack } = req.body;
-        
+
         const project = await Project.create({
             name,
             description: description || "No Description",
             owner: req.user.id,
             collaborators: collaborators || [],
             techStack: techStack || [],
-            progress: 0 
+            progress: 0
         });
 
         res.status(201).json({ success: true, project });
@@ -34,9 +34,9 @@ exports.getSingleProject = async (req, res) => {
         const project = await Project.findById(req.params.id)
             .populate({
                 path: 'kanban.backendBacklog kanban.frontendBacklog kanban.mobileBacklog kanban.design kanban.todo kanban.doing kanban.testing kanban.done',
-                model: 'Task', 
+                model: 'Task',
                 populate: {
-                    path: 'userId', 
+                    path: 'userId',
                     model: 'User',
                     select: 'username avatar'
                 }
@@ -53,13 +53,14 @@ exports.getSingleProject = async (req, res) => {
     }
 };
 
-// @desc    Get all projects user is part of (Owner or Collaborator)
+// @desc    Get all projects user is part of (Owner or Collaborator), sorted by last updated
 // @route   GET /api/projects
 exports.getProjects = async (req, res) => {
     try {
         const projects = await Project.find({
             $or: [{ owner: req.user.id }, { collaborators: req.user.id }]
         })
+        .sort({ updatedAt: -1 }) // Most recently updated first
         .populate('owner', 'username email avatar')
         .populate('collaborators', 'username avatar');
 
@@ -82,7 +83,7 @@ exports.updateProject = async (req, res) => {
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
         res.json({ success: true, project})
-        
+
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -103,7 +104,7 @@ exports.deleteProject = async (req, res) => {
 
         await project.deleteOne();
         res.json({ success: true, message: "Project and associated tasks deleted" });
-        
+
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -118,8 +119,8 @@ exports.addTaskToProject = async (req, res) => {
             title: title || 'New Task',
             userId: req.user.id,
             projectId: projectId,
-            category: 'Project', 
-            kanban: columnId,   
+            category: 'Project',
+            kanban: columnId,
             status: 'Not Started'
         });
 
@@ -149,7 +150,7 @@ exports.moveTask = async (req, res) => {
         project.kanban[toColumn].push(taskId);
 
         // 2. Define standard task updates
-        const taskUpdates = { 
+        const taskUpdates = {
             kanban: toColumn,
             status: toColumn === 'done' ? 'Completed' : 'In Progress'
         };
@@ -157,28 +158,28 @@ exports.moveTask = async (req, res) => {
         // 3. Logic for moving to 'doing' (Planner Integration)
         if (toColumn === 'doing') {
             const now = new Date();
-            const hourString = `${now.getHours().toString().padStart(2, '0')}:00`; 
-            
+            const hourString = `${now.getHours().toString().padStart(2, '0')}:00`;
+
             const dateString = now.toISOString().split('T')[0];
 
             await Planner.findOneAndUpdate(
-                { 
-                    userId: req.user.id, 
-                    date: dateString 
+                {
+                    userId: req.user.id,
+                    date: dateString
                 },
-                { 
+                {
                     $addToSet: { // $addToSet prevents duplicate entries if they double-click
-                        tasks: { 
-                            taskId: taskId, 
-                            time: hourString, 
+                        tasks: {
+                            taskId: taskId,
+                            time: hourString,
                             comments: "Started from Kanban"
-                        } 
-                    } 
+                        }
+                    }
                 },
-                { 
-                    upsert: true, 
-                    new: true, 
-                    setDefaultsOnInsert: true 
+                {
+                    upsert: true,
+                    new: true,
+                    setDefaultsOnInsert: true
                 }
             );
 
@@ -192,11 +193,11 @@ exports.moveTask = async (req, res) => {
         await project.save();
 
         // 6. Real-time update
-        req.io.to(projectId).emit('taskMoved', { 
-            taskId, 
-            fromColumn, 
-            toColumn, 
-            user: req.user.username 
+        req.io.to(projectId).emit('taskMoved', {
+            taskId,
+            fromColumn,
+            toColumn,
+            user: req.user.username
         });
 
         res.json({ success: true, project });
@@ -239,7 +240,7 @@ exports.addCollaborator = async (req, res) => {
 
         await project.save();
         return res.status(200).json({ success: true, message: 'Collaborator added '});
-        
+
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
     }

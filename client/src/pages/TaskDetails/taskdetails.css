@@ -131,6 +131,16 @@ textarea {
     cursor: pointer;
 }
 
+.detail-subtask-item.completed {
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.detail-subtask-item.completed .subtask-edit-input {
+    text-decoration: line-through;
+    color: #94a3b8;
+}
+
 .subtask-left {
     display: flex;
     align-items: center;
@@ -143,6 +153,59 @@ textarea {
     align-items: center;
     justify-content: flex-end;
     gap: 0.25rem;
+}
+
+/* Toggle switch for subtask completion */
+.subtask-toggle {
+    position: relative;
+    display: inline-block;
+    width: 2rem;
+    height: 1.1rem;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.subtask-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.subtask-toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    border-radius: 999px;
+    transition: background-color 0.2s ease;
+}
+
+.subtask-toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 0.85rem;
+    width: 0.85rem;
+    left: 0.125rem;
+    top: 0.125rem;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.subtask-toggle input:checked + .subtask-toggle-slider {
+    background-color: #22c55e;
+}
+
+.subtask-toggle input:checked + .subtask-toggle-slider::before {
+    transform: translateX(0.9rem);
+}
+
+.subtask-toggle input:focus-visible + .subtask-toggle-slider {
+    outline: 2px solid var(--primary, #3b82f6);
+    outline-offset: 2px;
 }
 
 .btn-sub-action {
@@ -260,7 +323,7 @@ textarea {
     width: 100%;
 }
 
-.circle-bg { 
+.circle-bg {
     fill: none;
     stroke: #f1f5f9;
     stroke-width: 2.8;

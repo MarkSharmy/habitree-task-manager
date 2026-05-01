@@ -2,16 +2,16 @@ import { useEffect, useState, useMemo, useRef } from 'react'; // Added useRef
 import { useParams, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { useSelector, useDispatch } from 'react-redux';
 import { BarLoader } from 'react-spinners';
-import { 
-    fetchTaskById, 
-    clearCurrentTask, 
-    updateTaskAction, 
+import {
+    fetchTaskById,
+    clearCurrentTask,
+    updateTaskAction,
     deleteTask // Ensure this is exported from taskSlice
 } from '../../store/slices/taskSlice';
 import ScheduleTaskModal from '../../components/modals/Scheduler/SchedulerModal';
-import { 
-    Calendar, Settings, Info, ListTodo, 
-    Trash2, PlayCircle, User, Tag, Folder, Edit3, MoreVertical 
+import {
+    Calendar, Settings, Info, ListTodo,
+    Trash2, PlayCircle, User, Tag, Folder, Edit3, MoreVertical
 } from 'lucide-react';
 import './taskdetails.css';
 
@@ -19,14 +19,14 @@ const TaskDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate(); // For redirecting after delete
-    
+
     const { currentTask: task, detailsLoading } = useSelector((state) => state.tasks);
-    
+
     const [descInput, setDescInput] = useState("");
     const [newSubtask, setNewSubtask] = useState("");
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
     const [selectedItemForSchedule, setSelectedItemForSchedule] = useState(null);
-    
+
     // Dropdown State
     const [showSettings, setShowSettings] = useState(false);
     const settingsRef = useRef(null);
@@ -86,9 +86,18 @@ const TaskDetails = () => {
         setNewSubtask("");
     };
 
+    const handleToggleSubtask = (stId) => {
+        const updatedSubtasks = task.subtasks.map(s =>
+            s._id === stId
+                ? { ...s, isCompleted: !s.isCompleted, status: !s.isCompleted ? 'Completed' : 'Not Started' }
+                : s
+        );
+        handleUpdate({ subtasks: updatedSubtasks });
+    };
+
     const openScheduler = (item = task) => {
-        const itemWithContext = item._id === task._id 
-            ? item 
+        const itemWithContext = item._id === task._id
+            ? item
             : { ...item, parentId: task._id, category: task.category, groupId: task.groupId };
 
         setSelectedItemForSchedule(itemWithContext);
@@ -96,7 +105,7 @@ const TaskDetails = () => {
     };
 
     if (detailsLoading || !task) return <div className="details-loader-container"><BarLoader color="#3b82f6" /><p>Syncing...</p></div>;
-    
+
     return (
         <div className="task-details-container">
             <header className="task-header">
@@ -110,16 +119,16 @@ const TaskDetails = () => {
                     <button className="btn-add-schedule" onClick={() => openScheduler()}>
                         <Calendar size={18} /> Add to Schedule
                     </button>
-                    
+
                     {/* Settings Dropdown */}
                     <div className="settings-menu-container" ref={settingsRef}>
-                        <button 
+                        <button
                             className={`btn-icon-settings ${showSettings ? 'active' : ''}`}
                             onClick={() => setShowSettings(!showSettings)}
                         >
                             <Settings size={18} />
                         </button>
-                        
+
                         {showSettings && (
                             <div className="settings-dropdown">
                                 <button className="dropdown-item" onClick={() => {/* Add Edit Logic */}}>
@@ -138,7 +147,7 @@ const TaskDetails = () => {
                 <section className="main-info-panel">
                     <div className="task-input-group">
                         <label>Description:</label>
-                        <textarea 
+                        <textarea
                             value={descInput}
                             onChange={(e) => setDescInput(e.target.value)}
                             onBlur={() => handleUpdate({ description: descInput })}
@@ -151,10 +160,25 @@ const TaskDetails = () => {
                         <label>Subtasks: {task.subtasks?.length || 0}</label>
                         <div className="subtasks-container">
                             {task.subtasks?.map((st, index) => (
-                                <div key={st._id || index} className="detail-subtask-item">
+                                <div
+                                    key={st._id || index}
+                                    className={`detail-subtask-item ${st.isCompleted ? 'completed' : ''}`}
+                                >
                                     <div className="subtask-left">
+                                        <label
+                                            className="subtask-toggle"
+                                            title={st.isCompleted ? 'Mark as incomplete' : 'Mark as complete'}
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={!!st.isCompleted}
+                                                onChange={() => handleToggleSubtask(st._id)}
+                                            />
+                                            <span className="subtask-toggle-slider" />
+                                        </label>
                                         <ListTodo size={16} color="#94a3b8" />
-                                        <input 
+                                        <input
                                             className="subtask-edit-input"
                                             defaultValue={st.title}
                                             onBlur={(e) => {
@@ -173,12 +197,12 @@ const TaskDetails = () => {
                             ))}
                         </div>
                         <div className="add-subtask-footer">
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 value={newSubtask}
                                 onChange={(e) => setNewSubtask(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleAddSubtask()}
-                                placeholder="Add new subtask..." 
+                                placeholder="Add new subtask..."
                             />
                             <button onClick={handleAddSubtask} className="btn-add-subtask">Add Subtask</button>
                         </div>
@@ -190,7 +214,7 @@ const TaskDetails = () => {
                     <div className="meta-list">
                         <div className="meta-item">
                             <div className="meta-label"><PlayCircle size={16}/> Status:</div>
-                            <select 
+                            <select
                                 className={`meta-select-badge ${task.status.replace(/\s+/g, '-').toLowerCase()}`}
                                 value={task.status}
                                 onChange={(e) => handleUpdate({ status: e.target.value })}
@@ -209,10 +233,10 @@ const TaskDetails = () => {
                         <div className="circular-progress">
                             <svg viewBox="0 0 36 36" className="circular-chart">
                                 <path className="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                <path 
-                                    className="circle" 
-                                    strokeDasharray={`${progressValue}, 100`} 
-                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                <path
+                                    className="circle"
+                                    strokeDasharray={`${progressValue}, 100`}
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                                 />
                                 <text x="18" y="20.35" className="percentage">{progressValue}%</text>
                             </svg>
@@ -221,7 +245,7 @@ const TaskDetails = () => {
                 </aside>
             </div>
 
-            <ScheduleTaskModal 
+            <ScheduleTaskModal
                 isOpen={isScheduleModalOpen}
                 onClose={() => setIsScheduleModalOpen(false)}
                 task={selectedItemForSchedule}
