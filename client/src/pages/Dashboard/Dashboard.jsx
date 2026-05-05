@@ -17,7 +17,7 @@ import './dashboard.css';
 
 const Dashboard = () => {
     const dispatch = useDispatch();
-    
+
     const { activeDate, dayData, loading: plannerLoading } = useSelector((state) => state.planner);
     const { efficiencyScore, totalProductivityMinutes, loading: statsLoading } = useSelector((state) => state.stats);
 
@@ -34,9 +34,8 @@ const Dashboard = () => {
         return `${h}h ${m}m`;
     };
 
-    // Helper to format date for display
     const formatDisplayDate = (dateStr) => {
-        const options = { weekday: 'long', month: 'short', day: 'numeric' };
+        const options = { weekday: 'short', month: 'short', day: 'numeric' };
         return new Date(dateStr).toLocaleDateString('en-US', options);
     };
 
@@ -48,23 +47,18 @@ const Dashboard = () => {
     };
 
     const handleItemClick = (entry) => {
-        setSelectedPlannerItem({
-            ...entry,
-            date: activeDate 
-        });
+        setSelectedPlannerItem({ ...entry, date: activeDate });
         setIsItemModalOpen(true);
     };
 
     const handleStatusUpdate = (id, newStatus) => {
         console.log(`Updating item ${id} to ${newStatus}`);
-        // Dispatch your update action here (e.g., updatePlannerStatus)
         setIsItemModalOpen(false);
     };
 
-    // Trigger fetch whenever activeDate changes
     useEffect(() => {
         dispatch(fetchPlannerByDate(activeDate));
-        dispatch(fetchTodayStats()); // You might want to update this to fetch stats for the specific date too
+        dispatch(fetchTodayStats());
     }, [dispatch, activeDate]);
 
     if (statsLoading || plannerLoading) return (
@@ -79,16 +73,16 @@ const Dashboard = () => {
             <div className="planner-header">
                 <h2>Tasks Overview</h2>
                 <div className="date-picker">
-                    <ChevronLeft 
-                        size={20} 
-                        className="date-picker-icon" 
+                    <ChevronLeft
+                        size={20}
+                        className="date-picker-icon"
                         onClick={() => handleDateStep(-1)}
                     />
-                    <Calendar size={16} strokeWidth={2}/>
+                    <Calendar size={16} strokeWidth={2} />
                     <span>{formatDisplayDate(activeDate)}</span>
-                    <ChevronRight 
-                        size={20} 
-                        className="date-picker-icon" 
+                    <ChevronRight
+                        size={20}
+                        className="date-picker-icon"
                         onClick={() => handleDateStep(1)}
                     />
                 </div>
@@ -99,8 +93,8 @@ const Dashboard = () => {
                 <section className="planner-section">
                     <div className="planner-card">
                         <div className="card-header">
-                            <div>
-                                <span className="icon"><Calendar size={16} strokeWidth={2}/></span> 
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <Calendar size={16} strokeWidth={2} />
                                 <span>Scheduler</span>
                             </div>
                             <button className="start-session-btn" onClick={() => setSettingsOpen(true)}>
@@ -110,14 +104,14 @@ const Dashboard = () => {
                         <div className="task-list">
                             {dayData?.tasks?.length > 0 ? (
                                 dayData.tasks.map((entry) => (
-                                    <div 
-                                        key={entry._id} 
+                                    <div
+                                        key={entry._id}
                                         onClick={() => handleItemClick(entry)}
                                         style={{ cursor: 'pointer' }}
                                     >
-                                        <PlannerItem 
-                                            item={entry.taskId} 
-                                            scheduledTime={entry.time} 
+                                        <PlannerItem
+                                            item={entry.taskId}
+                                            scheduledTime={entry.time}
                                             specificSubtaskId={entry.subtaskId}
                                         />
                                     </div>
@@ -130,8 +124,7 @@ const Dashboard = () => {
                                     <p>Your schedule is clear for today.</p>
                                     <small>Add tasks from your inventory or use "Quick Add" to get started.</small>
                                 </div>
-                            )
-                        }
+                            )}
                         </div>
                     </div>
                 </section>
@@ -143,7 +136,7 @@ const Dashboard = () => {
                         <small>Sums all completed sessions.</small>
                     </div>
 
-                    <EfficiencyWidget score={efficiencyScore}/>
+                    <EfficiencyWidget score={efficiencyScore} />
 
                     <div className="stat-card">
                         <h4>Weekly Overview</h4>
@@ -174,14 +167,9 @@ const Dashboard = () => {
                 initialSeconds={sessionTime}
                 onFinish={async (data) => {
                     try {
-                        // 1. Dispatch the save and wait for it to resolve
                         await dispatch(saveWorkSession(data)).unwrap();
-                        
-                        // 2. Refresh stats and planner so the UI updates immediately
                         dispatch(fetchTodayStats());
                         dispatch(fetchPlannerByDate(activeDate));
-                        
-                        // 3. Only now close the modal
                         setActiveModalOpen(false);
                     } catch (err) {
                         console.error("Failed to save session:", err);
@@ -190,11 +178,11 @@ const Dashboard = () => {
                 onClose={() => setActiveModalOpen(false)}
             />
 
-            <ItemModal 
+            <ItemModal
                 isOpen={isItemModalOpen}
                 onClose={() => setIsItemModalOpen(false)}
                 item={selectedPlannerItem}
-                activeDate={activeDate} // Add this line
+                activeDate={activeDate}
                 onStatusUpdate={handleStatusUpdate}
             />
         </div>

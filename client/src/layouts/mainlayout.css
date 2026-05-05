@@ -12,6 +12,8 @@
     flex-direction: column;
     position: fixed;
     height: 100vh;
+    z-index: 100;
+    transition: transform 0.3s ease;
 }
 
 .sidebar-header {
@@ -46,8 +48,8 @@
 }
 
 .logout-btn:hover {
-    background-color: #fff1f2; /* Light red background */
-    color: #e11d48; /* Red text */
+    background-color: #fff1f2;
+    color: #e11d48;
 }
 
 .sidebar-nav {
@@ -105,6 +107,7 @@
     overflow-x: hidden;
     flex-direction: column;
 }
+
 .app-header {
     height: var(--header-h);
     background-color: white;
@@ -136,6 +139,37 @@
     flex: 1;
 }
 
+/* --- MOBILE BOTTOM NAV --- */
+.mobile-bottom-nav {
+    display: none;
+}
+
+/* Mobile overlay backdrop */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+    backdrop-filter: blur(0.125rem);
+}
+
+.sidebar-overlay.visible {
+    display: block;
+}
+
+/* Hamburger button */
+.hamburger-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: #636e73;
+    align-items: center;
+    justify-content: center;
+}
+
 /* RESPONSIVENESS */
 @media (max-width: 62rem) { /* Tablet */
     :root { --sb-width: 5rem; }
@@ -144,6 +178,99 @@
 }
 
 @media (max-width: 48rem) { /* Mobile */
-    .app-sidebar { display: none; } /* Add a hamburger menu logic later */
-    .content-area { margin-left: 0; }
+    /* Hide desktop sidebar */
+    .app-sidebar {
+        transform: translateX(-100%);
+        width: 16rem;
+        box-shadow: 0.25rem 0 1.5rem rgba(0,0,0,0.15);
+    }
+
+    .app-sidebar.open {
+        transform: translateX(0);
+    }
+
+    /* Restore sidebar nav items to full layout when drawer is open */
+    .app-sidebar.open .nav-item {
+        justify-content: flex-start;
+        padding: 0.8rem 1.5rem;
+    }
+
+    .app-sidebar.open .nav-item span:not(.icon),
+    .app-sidebar.open .sidebar-header h2 {
+        display: inline;
+    }
+
+    .content-area {
+        margin-left: 0;
+    }
+
+    /* Compact header */
+    .app-header {
+        padding: 0 1rem;
+        height: 3.5rem;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    .hamburger-btn {
+        display: flex;
+    }
+
+    .header-right {
+        gap: 0.5rem;
+    }
+
+    /* Hide search on mobile — can use icon only */
+    .header-right .icon-btn:first-child {
+        display: none;
+    }
+
+    .user-text {
+        display: none;
+    }
+
+    .page-container {
+        padding: 1rem;
+        padding-bottom: 5rem; /* Space for bottom nav */
+    }
+
+    /* Bottom navigation bar */
+    .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4rem;
+        background: white;
+        border-top: 0.0625rem solid #e0e0e0;
+        z-index: 90;
+        align-items: stretch;
+        box-shadow: 0 -0.125rem 0.75rem rgba(0,0,0,0.07);
+    }
+
+    .mobile-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        text-decoration: none;
+        color: #94a3b8;
+        font-size: 0.625rem;
+        font-weight: 500;
+        transition: color 0.2s ease;
+        padding: 0.5rem 0.25rem;
+    }
+
+    .mobile-nav-item.active {
+        color: #3498db;
+    }
+
+    .mobile-nav-item span {
+        font-size: 0.625rem;
+        letter-spacing: 0.01rem;
+    }
 }
