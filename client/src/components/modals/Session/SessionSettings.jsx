@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Play, Info, Minus, Plus} from 'lucide-react';
+import { useState } from 'react';
+import { X, Play, Info, Minus, Plus } from 'lucide-react';
 import './sessionCommon.css';
 
 import Logo from '../../../assets/logo.png';
@@ -9,12 +9,11 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
     const [minutes, setMinutes] = useState(20);
     const [seconds, setSeconds] = useState(0);
 
-    //Calculate total seconds for the slider logic
     const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
     const maxSeconds = 3600 * 3;
 
     const handleQuickTime = (mins) => {
-        setHours(Math.floor(mins /60));
+        setHours(Math.floor(mins / 60));
         setMinutes(mins % 60);
         setSeconds(0);
     };
@@ -23,7 +22,7 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
         if (unit === 'h') setHours(prev => Math.max(0, prev + amount));
         if (unit === 'm') setMinutes(prev => Math.max(0, Math.min(59, prev + amount)));
         if (unit === 's') setSeconds(prev => Math.max(0, Math.min(59, prev + amount)));
-    }
+    };
 
     if (!isOpen) return null;
 
@@ -31,8 +30,13 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
         <div className="modal-overlay">
             <div className="session-modal">
                 <header className="modal-header">
-                    <div className="modal-logo"><img src={Logo} style={{height: '2.5rem'}}/> Habitree</div>
-                    <button className="close-btn" onClick={onClose}><X size={20} strokeWidth={2} /></button>
+                    <div className="modal-logo">
+                        <img src={Logo} style={{ height: '2rem' }} alt="Habitree" />
+                        Habitree
+                    </div>
+                    <button className="close-btn" onClick={onClose}>
+                        <X size={20} strokeWidth={2} />
+                    </button>
                 </header>
 
                 <div className="session-modal-body">
@@ -45,9 +49,9 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
                     </div>
 
                     <div className="timer-controls-grid">
-                        <TimeUnit label="Hours" value={hours} onAdj={(amount) => adjustUnit('h', amount)} />
-                        <TimeUnit label="Minutes" value={minutes} onAdj={(amount) => adjustUnit('m', amount)} />
-                        <TimeUnit label="Seconds" value={seconds} onAdj={(amount) => adjustUnit('s', amount)} />
+                        <TimeUnit label="Hours"   value={hours}   onAdj={(a) => adjustUnit('h', a)} />
+                        <TimeUnit label="Minutes" value={minutes} onAdj={(a) => adjustUnit('m', a)} />
+                        <TimeUnit label="Seconds" value={seconds} onAdj={(a) => adjustUnit('s', a)} />
                     </div>
 
                     <div className="slider-container">
@@ -62,30 +66,42 @@ const SessionSettings = ({ isOpen, onClose, onStart }) => {
                     </div>
 
                     <div className="quick-times">
-                        <span className="quick-label">Quick Times:</span>
-                        <button onClick={() => handleQuickTime(20)} className="qt-btn active">20 mins (Pomodoro)</button>
-                        <button onClick={() => handleQuickTime(30)} className="qt-btn">30 mins</button>
-                        <button onClick={() => handleQuickTime(40)} className="qt-btn">40 mins</button>
-                        <button onClick={() => handleQuickTime(60)} className="qt-btn">60 mins</button>
+                        <span className="quick-label">Quick:</span>
+                        <button onClick={() => handleQuickTime(20)} className={`qt-btn ${minutes === 20 && hours === 0 && seconds === 0 ? 'active' : ''}`}>
+                            20m
+                        </button>
+                        <button onClick={() => handleQuickTime(30)} className={`qt-btn ${minutes === 30 && hours === 0 && seconds === 0 ? 'active' : ''}`}>
+                            30m
+                        </button>
+                        <button onClick={() => handleQuickTime(40)} className={`qt-btn ${minutes === 40 && hours === 0 && seconds === 0 ? 'active' : ''}`}>
+                            40m
+                        </button>
+                        <button onClick={() => handleQuickTime(60)} className={`qt-btn ${hours === 1 && minutes === 0 && seconds === 0 ? 'active' : ''}`}>
+                            60m
+                        </button>
                     </div>
                 </div>
 
                 <footer className="session-modal-footer">
                     <div className="footer-actions">
                         <button className="btn-cancel" onClick={onClose}>Cancel</button>
-                        <button className="btn-start" onClick={() => onStart(totalSeconds)}>
-                            <Play size={20} strokeWidth={2} fill="currentColor" /> Start Session
+                        <button
+                            className="btn-start"
+                            onClick={() => onStart(totalSeconds)}
+                            disabled={totalSeconds === 0}
+                        >
+                            <Play size={18} strokeWidth={2} fill="currentColor" /> Start Session
                         </button>
                     </div>
                     <div className="footer-info">
-                        <Info size={20} strokeWidth={2} />
+                        <Info size={16} strokeWidth={2} />
                         <p>Timer countdown will begin upon 'Start Session'</p>
                     </div>
                 </footer>
             </div>
         </div>
     );
-}
+};
 
 const TimeUnit = ({ label, value, onAdj }) => (
     <div className="time-unit-box">
