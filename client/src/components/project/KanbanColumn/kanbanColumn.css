@@ -111,9 +111,10 @@
 
 @media (max-width: 48rem) {
     .kanban-column {
-        min-width: 14rem;
-        max-width: 14rem;
-        /* Remove fixed height on mobile — let content determine height */
+        /* Each column takes most of the viewport width for easy reading */
+        min-width: calc(100vw - 4rem);
+        max-width: calc(100vw - 4rem);
         max-height: 75vh;
+        scroll-snap-align: center;
     }
 }
