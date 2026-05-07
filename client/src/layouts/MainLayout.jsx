@@ -1,21 +1,12 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
+import { fetchCurrentUser } from '../store/slices/userSlice';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-    LayoutDashboard,
-    ListTodo,
-    BarChart3,
-    Map,
-    Calendar,
-    PieChart,
-    Settings,
-    Bell,
-    Search,
-    Kanban,
-    LogOut,
-    Menu,
-    X
+    LayoutDashboard, ListTodo, Map, Calendar,
+    PieChart, Settings, Bell, Search,
+    Kanban, LogOut, Menu, X
 } from 'lucide-react';
 import Logo from '../assets/logo.png';
 import Avatar from '../assets/profile.png';
@@ -27,18 +18,22 @@ const MainLayout = () => {
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
+    const { profile } = useSelector((state) => state.user);
+
+    useEffect(() => {
+        dispatch(fetchCurrentUser());
+    }, [dispatch]);
+
     const isActive = (path) => location.pathname === path ? 'active' : '';
+    const closeSidebar = () => setSidebarOpen(false);
 
     const handleLogout = () => {
         dispatch(logout());
         navigate('/');
     };
 
-    const closeSidebar = () => setSidebarOpen(false);
-
     return (
         <div className="app-shell">
-            {/* Overlay for mobile sidebar */}
             <div
                 className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
                 onClick={closeSidebar}
@@ -60,7 +55,7 @@ const MainLayout = () => {
                         <ListTodo size={20} strokeWidth={2} />
                         <span>All Tasks</span>
                     </Link>
-                    <Link to="/projects" className={`nav-item ${isActive('/project')}`} onClick={closeSidebar}>
+                    <Link to="/projects" className={`nav-item ${isActive('/projects')}`} onClick={closeSidebar}>
                         <Kanban size={20} strokeWidth={2} />
                         <span>Projects</span>
                     </Link>
@@ -108,13 +103,13 @@ const MainLayout = () => {
                             <Bell size={18} />
                             <span className="dot"></span>
                         </div>
-                        <div className="user-profile">
+                        <Link to="/settings" className="user-profile" style={{ textDecoration: 'none' }}>
                             <img src={Avatar} alt="User" className="avatar" style={{ height: '2rem', borderRadius: '50%' }} />
                             <div className="user-text">
-                                <span className="user-name">Mark Sharmy</span>
-                                <span className="user-rank">Master</span>
+                                <span className="user-name">{profile?.username || '—'}</span>
+                                <span className="user-rank">{profile?.role || '—'}</span>
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </header>
 
@@ -123,7 +118,6 @@ const MainLayout = () => {
                 </main>
             </div>
 
-            {/* Mobile Bottom Navigation */}
             <nav className="mobile-bottom-nav">
                 <Link to="/dashboard" className={`mobile-nav-item ${isActive('/dashboard')}`}>
                     <LayoutDashboard size={20} strokeWidth={2} />
@@ -133,7 +127,7 @@ const MainLayout = () => {
                     <ListTodo size={20} strokeWidth={2} />
                     <span>Tasks</span>
                 </Link>
-                <Link to="/projects" className={`mobile-nav-item ${isActive('/project')}`}>
+                <Link to="/projects" className={`mobile-nav-item ${isActive('/projects')}`}>
                     <Kanban size={20} strokeWidth={2} />
                     <span>Projects</span>
                 </Link>
@@ -141,9 +135,9 @@ const MainLayout = () => {
                     <Calendar size={20} strokeWidth={2} />
                     <span>Calendar</span>
                 </Link>
-                <Link to="/analytics" className={`mobile-nav-item ${isActive('/analytics')}`}>
-                    <PieChart size={20} strokeWidth={2} />
-                    <span>Stats</span>
+                <Link to="/settings" className={`mobile-nav-item ${isActive('/settings')}`}>
+                    <Settings size={20} strokeWidth={2} />
+                    <span>Profile</span>
                 </Link>
             </nav>
         </div>

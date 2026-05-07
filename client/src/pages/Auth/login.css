@@ -1,24 +1,23 @@
 .auth-page {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: #e9effd;
-    padding: 4rem;
+    padding: 2rem;
 }
 
 .login-card {
     display: flex;
     width: 100%;
     max-width: 45rem;
-    height: 32rem;
     background-color: white;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     overflow: hidden;
     box-shadow: 0 1.25rem 3.125rem rgba(0, 0, 0, 0.1);
 }
 
-/* LEFT HERO SIDE */
+/* ── Left hero side ── */
 .auth-hero {
     flex: 1;
     background: linear-gradient(135deg, #448aff 0%, #0055ff 100%);
@@ -28,7 +27,7 @@
     justify-content: center;
     color: white;
     overflow: hidden;
-    padding: 1rem;
+    padding: 2rem 1rem;
 }
 
 .hero-content {
@@ -38,14 +37,14 @@
 }
 
 .hero-subtitle {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 300;
     margin-bottom: 0.5rem;
     letter-spacing: 0.05rem;
 }
 
 .hero-title {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 300;
     letter-spacing: 0.1rem;
     margin: 0;
@@ -59,11 +58,10 @@
     border-radius: 0.125rem;
 }
 
-
-/* RIGHT FORM SIDE */
+/* ── Right form side ── */
 .auth-form-container {
     flex: 1;
-    padding: 2rem;
+    padding: 2.5rem 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -81,22 +79,22 @@
 }
 
 .form-header {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     text-align: center;
 }
 
 .form-header h2 {
     color: #448aff;
     font-weight: 400;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
 }
 
 .form-header p {
     color: #a0a0a0;
     font-size: 0.75rem;
     line-height: 1.5;
-    padding: 0 1rem;
+    padding: 0 0.5rem;
 }
 
 .login-form {
@@ -121,12 +119,14 @@
 
 .login-form input {
     width: 100%;
+    box-sizing: border-box;
     padding: 0.875rem 1rem;
     background-color: #f7f9fb;
     border: none;
     outline: none;
     color: #2d3436;
     font-size: 0.9rem;
+    font-family: 'Rubik', sans-serif;
 }
 
 .login-form input::placeholder {
@@ -134,8 +134,8 @@
 }
 
 .login-submit-btn {
-    margin-top: 1.5rem;
-    padding: 1rem 0.5rem;
+    margin-top: 1.25rem;
+    padding: 0.875rem 0.5rem;
     background-color: #007bff;
     color: white;
     border: none;
@@ -144,6 +144,8 @@
     letter-spacing: 0.05rem;
     cursor: pointer;
     transition: background 0.3s;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.9rem;
 }
 
 .login-submit-btn:hover {
@@ -156,29 +158,49 @@
 }
 
 .form-footer {
-    margin-top: 3rem;
+    margin-top: 2rem;
     text-align: center;
 }
 
 .back-home {
     color: #448aff;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
-
-
-/* RESPONSIVENESS */
+/* ── MOBILE ── */
 @media (max-width: 48rem) {
+    .auth-page {
+        padding: 0;
+        align-items: flex-end;
+    }
+
     .login-card {
         flex-direction: column;
-        height: auto;
+        border-radius: 1.25rem 1.25rem 0 0;
+        max-width: 100%;
+        min-height: auto;
+        box-shadow: 0 -0.5rem 2rem rgba(0, 0, 0, 0.12);
     }
 
     .auth-hero {
-        padding: 3rem 1rem;
+        padding: 2.5rem 1rem;
+        min-height: 12rem;
+    }
+
+    .hero-title {
+        font-size: 1.6rem;
     }
 
     .auth-form-container {
-        padding: 2.5rem 1.5rem;
+        padding: 2rem 1.5rem 2.5rem;
+    }
+
+    .login-submit-btn {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    .form-footer {
+        margin-top: 1.5rem;
     }
 }

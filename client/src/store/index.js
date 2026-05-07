@@ -7,10 +7,12 @@ import groupReducer from './slices/groupSlice';
 import plannerReducer from './slices/plannerSlice';
 import sessionReducer from './slices/sessionSlice';
 import projectReducer from './slices/projectSlice';
+import userReducer from './slices/userSlice';
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
+        user: userReducer,
         tasks: taskReducer,
         stats: statsReducer,
         roadmaps: roadmapReducer,
@@ -19,6 +21,4 @@ export const store = configureStore({
         session: sessionReducer,
         projects: projectReducer,
     },
-    //Add middleware here...
 });
-

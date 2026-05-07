@@ -13,41 +13,39 @@ const RegisterPage = () => {
         password: '',
         confirmPassword: '',
     });
-    
+    const [localError, setLocalError] = useState('');
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const{ loading, error, isAuthenticated } = useSelector((state) => state.auth);
+    const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            navigate('/dashboard');
-        }
+        if (isAuthenticated) navigate('/dashboard');
     }, [isAuthenticated, navigate]);
-    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        setError('');
+        setLocalError('');
     };
 
     const handleRegister = (e) => {
         e.preventDefault();
-
         if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match')
+            setLocalError('Passwords do not match');
             return;
         }
-        
         const { confirmPassword, ...submitData } = formData;
         dispatch(registerUser(submitData));
     };
 
-    return(
+    const displayError = localError || error;
+
+    return (
         <div className="auth-page">
             <div className="register-card">
-                {/* TOP SIDE: Branding Banner */}
-                <div className="auth-banner" style={{backgroundImage: `url(${HeroBG})`, backgroundSize: 'cover'}}>
+                {/* Top: Branding Banner */}
+                <div className="auth-banner" style={{ backgroundImage: `url(${HeroBG})`, backgroundSize: 'cover' }}>
                     <div className="banner-content">
                         <p className="banner-subtitle">Ready To Get Locked In?</p>
                         <h1 className="banner-title">CREATE ACCOUNT</h1>
@@ -55,13 +53,13 @@ const RegisterPage = () => {
                     </div>
                 </div>
 
-                {/* BOTTOM SIDE: Form */}
+                {/* Bottom: Form */}
                 <div className="auth-form-container">
                     <form className="register-form" onSubmit={handleRegister}>
-                        {error && <div className="auth-error-msg">{error}</div>}
+                        {displayError && <div className="auth-error-msg">{displayError}</div>}
 
                         <div className="input-group">
-                            <input 
+                            <input
                                 type="text"
                                 name="username"
                                 placeholder="Username"
@@ -71,7 +69,7 @@ const RegisterPage = () => {
                             />
                         </div>
                         <div className="input-group">
-                            <input 
+                            <input
                                 type="email"
                                 name="email"
                                 placeholder="Email"
@@ -81,7 +79,7 @@ const RegisterPage = () => {
                             />
                         </div>
                         <div className="input-group">
-                            <input 
+                            <input
                                 type="password"
                                 name="password"
                                 placeholder="Password"
@@ -91,7 +89,7 @@ const RegisterPage = () => {
                             />
                         </div>
                         <div className="input-group">
-                            <input 
+                            <input
                                 type="password"
                                 name="confirmPassword"
                                 placeholder="Confirm Password"
@@ -100,12 +98,12 @@ const RegisterPage = () => {
                                 required
                             />
                         </div>
+
+                        <button type="submit" className="auth-submit-btn" disabled={loading}>
+                            {loading ? 'Registering...' : 'Register'}
+                        </button>
                     </form>
-                    
-                    <button type="submit" className="auth-submit-btn" disabled={loading}>
-                        {loading ? "Registering..." : "Register"}
-                    </button>
-                    
+
                     <div className="form-footer">
                         <Link to="/" className="back-home-link">Back to home</Link>
                         <p className="auth-switch-prompt">
@@ -116,6 +114,6 @@ const RegisterPage = () => {
             </div>
         </div>
     );
-}
+};
 
 export default RegisterPage;
