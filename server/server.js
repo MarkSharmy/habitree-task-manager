@@ -38,6 +38,7 @@ app.use('/api/auth',          require('./routes/authRoutes'));
 app.use('/api/users',         require('./routes/userRoutes'));
 app.use('/api/tasks',         require('./routes/taskRoutes'));
 app.use('/api/projects',      require('./routes/projectRoutes'));
+app.use('/api/roadmaps',      require('./routes/roadmapRoutes'));
 app.use('/api/groups',        require('./routes/groupRoutes'));
 app.use('/api/sessions',      require('./routes/sessionRoutes'));
 app.use('/api/planner',       require('./routes/plannerRoutes'));

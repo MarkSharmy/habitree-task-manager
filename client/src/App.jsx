@@ -10,6 +10,9 @@ import ProjectManager from './pages/ProjectManager/ProjectManager';
 import ProjectKanban from './pages/ProjectKanban/ProjectKanban';
 import Profile from './pages/Profile/Profile';
 import Analytics from './pages/Analytics/Analytics';
+import Calendar from './pages/Calendar/Calendar';
+import RoadmapList from './pages/Roadmaps/RoadmapList';
+import RoadmapCanvas from './pages/Roadmaps/RoadmapCanvas';
 import NotFound from './pages/NotFound/NotFound';
 import ServerError from './pages/Error/ServerError';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -32,6 +35,9 @@ function App() {
                     <Route path="/projects/:id" element={<ProjectKanban />} />
                     <Route path="/settings" element={<Profile />} />
                     <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/calendar" element={<Calendar />} />
+                    <Route path="/roadmaps" element={<RoadmapList />} />
+                    <Route path="/roadmaps/:id" element={<RoadmapCanvas />} />
                 </Route>
 
                 <Route path="/server-error" element={<ServerError />} />
