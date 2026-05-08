@@ -1,14 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import API from '../../api/axiosInstance';
 
+// Accepts optional date string for the summary cards
 export const fetchTodayStats = createAsyncThunk(
     'analytics/fetchTodayStats',
-    async (_, { rejectWithValue }) => {
+    async (date, { rejectWithValue }) => {
         try {
-            const { data } = await API.get('/stats/today');
+            const params = date ? `?date=${date}` : '';
+            const { data } = await API.get(`/stats/day${params}`);
             return data;
         } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Failed to fetch today stats');
+            return rejectWithValue(err.response?.data?.message || 'Failed to fetch stats');
         }
     }
 );
@@ -56,6 +58,7 @@ const analyticsSlice = createSlice({
             totalMinutes: 0,
             efficiencyScore: 0,
             sessionsCount: 0,
+            date: null,
         },
         weekly: [],
         monthly: [],
@@ -80,6 +83,7 @@ const analyticsSlice = createSlice({
                     totalMinutes: action.payload.totalMinutes || 0,
                     efficiencyScore: action.payload.efficiencyScore || 0,
                     sessionsCount: action.payload.sessionsCount || 0,
+                    date: action.payload.date || null,
                 };
             })
             .addCase(fetchTodayStats.rejected, setError)

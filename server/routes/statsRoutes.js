@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const {
-    getTodayOverview,
+    getDayOverview,
     getWeeklyStats,
     getMonthlyStats,
     getTaskVolumeStats,
@@ -10,8 +10,11 @@ const {
 
 router.use(protect);
 
-// @route   GET /api/stats/today
-router.get('/today', getTodayOverview);
+// @route   GET /api/stats/day?date=YYYY-MM-DD  (date optional, defaults to today)
+router.get('/day', getDayOverview);
+
+// Keep /today as alias for backwards compatibility
+router.get('/today', getDayOverview);
 
 // @route   GET /api/stats/weekly
 router.get('/weekly', getWeeklyStats);

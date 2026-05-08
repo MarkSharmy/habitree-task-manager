@@ -404,6 +404,66 @@
     gap: 0.5rem;
 }
 
+/* ── Date navigator (analytics page) ── */
+.analytics-date-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.analytics-date-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark-text);
+    min-width: 5rem;
+    text-align: center;
+}
+
+.analytics-date-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.625rem;
+    border: 1.5px solid var(--grey-bd);
+    border-radius: 0.5rem;
+    background: white;
+    color: var(--soft-text);
+    cursor: pointer;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.8rem;
+    transition: all 0.15s;
+}
+
+.analytics-date-btn:hover:not(:disabled) {
+    border-color: var(--btn-blue);
+    color: var(--btn-blue);
+}
+
+.analytics-date-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.analytics-today-btn {
+    background: var(--btn-blue);
+    border-color: var(--btn-blue);
+    color: white;
+    padding: 0.35rem 0.875rem;
+}
+
+.analytics-today-btn:hover {
+    background: var(--btn-blue-hover) !important;
+    border-color: var(--btn-blue-hover) !important;
+    color: white !important;
+}
+
+@media (max-width: 48rem) {
+    .analytics-date-nav {
+        justify-content: center;
+    }
+}
+
 /* ── MOBILE ── */
 @media (max-width: 48rem) {
     .stat-cards-row {

@@ -19,7 +19,7 @@ const Dashboard = () => {
     const dispatch = useDispatch();
 
     const { activeDate, dayData, loading: plannerLoading } = useSelector((state) => state.planner);
-    const { efficiencyScore, totalProductivityMinutes, loading: statsLoading } = useSelector((state) => state.stats);
+    const { efficiencyScore, totalProductivityMinutes, sessionsCount, loading: statsLoading } = useSelector((state) => state.stats);
 
     const [selectedPlannerItem, setSelectedPlannerItem] = useState(null);
     const [isItemModalOpen, setIsItemModalOpen] = useState(false);
@@ -56,10 +56,13 @@ const Dashboard = () => {
         setIsItemModalOpen(false);
     };
 
+    // Fetch planner AND stats for the active date whenever it changes
     useEffect(() => {
         dispatch(fetchPlannerByDate(activeDate));
-        dispatch(fetchTodayStats());
+        dispatch(fetchTodayStats(activeDate));
     }, [dispatch, activeDate]);
+
+    const isToday = activeDate === new Date().toISOString().split('T')[0];
 
     if (statsLoading || plannerLoading) return (
         <div className="details-loader-container">
@@ -121,7 +124,7 @@ const Dashboard = () => {
                                     <div className="empty-icon-container">
                                         <Calendar size={48} strokeWidth={1} />
                                     </div>
-                                    <p>Your schedule is clear for today.</p>
+                                    <p>Your schedule is clear{isToday ? ' for today' : ' for this day'}.</p>
                                     <small>Add tasks from your inventory or use "Quick Add" to get started.</small>
                                 </div>
                             )}
@@ -133,14 +136,15 @@ const Dashboard = () => {
                     <div className="stat-card">
                         <h4>Total Productivity Time</h4>
                         <p className="big-stat">{formatMinutes(totalProductivityMinutes)}</p>
-                        <small>Sums all completed sessions.</small>
+                        <small>{isToday ? 'Today' : formatDisplayDate(activeDate)}</small>
                     </div>
 
                     <EfficiencyWidget score={efficiencyScore} />
 
                     <div className="stat-card">
-                        <h4>Weekly Overview</h4>
-                        <div className="mini-chart-placeholder"></div>
+                        <h4>Sessions</h4>
+                        <p className="big-stat">{sessionsCount || 0}</p>
+                        <small>completed {isToday ? 'today' : 'this day'}</small>
                     </div>
 
                     <div className="stat-card">
@@ -168,11 +172,12 @@ const Dashboard = () => {
                 onFinish={async (data) => {
                     try {
                         await dispatch(saveWorkSession(data)).unwrap();
-                        dispatch(fetchTodayStats());
+                        // Refresh stats and planner for the active date
+                        dispatch(fetchTodayStats(activeDate));
                         dispatch(fetchPlannerByDate(activeDate));
                         setActiveModalOpen(false);
                     } catch (err) {
-                        console.error("Failed to save session:", err);
+                        console.error('Failed to save session:', err);
                     }
                 }}
                 onClose={() => setActiveModalOpen(false)}
