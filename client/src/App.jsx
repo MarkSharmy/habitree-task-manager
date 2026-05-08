@@ -9,6 +9,7 @@ import TaskDetails from './pages/TaskDetails/TaskDetails';
 import ProjectManager from './pages/ProjectManager/ProjectManager';
 import ProjectKanban from './pages/ProjectKanban/ProjectKanban';
 import Profile from './pages/Profile/Profile';
+import Analytics from './pages/Analytics/Analytics';
 import NotFound from './pages/NotFound/NotFound';
 import ServerError from './pages/Error/ServerError';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -30,6 +31,7 @@ function App() {
                     <Route path="/projects" element={<ProjectManager />} />
                     <Route path="/projects/:id" element={<ProjectKanban />} />
                     <Route path="/settings" element={<Profile />} />
+                    <Route path="/analytics" element={<Analytics />} />
                 </Route>
 
                 <Route path="/server-error" element={<ServerError />} />
