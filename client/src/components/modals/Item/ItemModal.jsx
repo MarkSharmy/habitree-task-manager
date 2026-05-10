@@ -1,60 +1,51 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateTaskStatus } from '../../../store/slices/taskSlice';
 import { removeTaskFromPlanner } from '../../../store/slices/plannerSlice';
-import { 
-    X, Tag, Folder, Calendar, Clock, 
-    CheckCircle2, Archive, Trash2 
+import {
+    X, Tag, Folder, Calendar, Clock,
+    CheckCircle2, Archive, Trash2
 } from 'lucide-react';
 import Logo from '../../../assets/logo.png';
 import './itemModal.css';
 
 const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
+    const dispatch = useDispatch();
+    const { profile } = useSelector(state => state.user);
 
     if (!isOpen || !item) return null;
 
     const task = item.taskId;
     const isSubtask = !!item.subtaskId;
+    const isCompleted = task?.status === 'Completed';
 
-    const dispatch = useDispatch();
-
+    /* Mark as complete — stays in planner, visually highlighted */
     const handleComplete = async () => {
-        if (isSubtask) {
-            // Logic for subtasks if needed
-            console.log("Flipping subtask isCompleted");
-        } else {
-            // This triggers the backend to move task to 'done' column
-            await dispatch(updateTaskStatus({ id: task._id, status: 'Completed' }));
-            // Also remove from today's planner since it is finished
-            await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
-        }
-        onClose();
-    };
-
-    const handleRemove = async () => {
-        await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
-        
         if (!isSubtask) {
-            await dispatch(updateTaskStatus({ id: task._id, status: 'On-Hold' }));
+            await dispatch(updateTaskStatus({ id: task._id, status: 'Completed' }));
         }
         onClose();
     };
 
+    /* Shelve — remove from planner and mark task as Shelved */
     const handleShelve = async () => {
-        // 1. Remove from the visual planner for the active date
         await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
-        
-        // 2. Update status to 'Shelved' which the backend maps to 'todo'
         if (!isSubtask) {
             await dispatch(updateTaskStatus({ id: task._id, status: 'Shelved' }));
         }
         onClose();
     };
 
-    // Helper to format the date string passed from Dashboard
+    /* Remove — pulls it off the planner list only, no status change */
+    const handleRemove = async () => {
+        await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
+        onClose();
+    };
+
     const formatFullDate = (dateStr) => {
-        if (!dateStr) return "";
-        const options = { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' };
-        return new Date(dateStr).toLocaleDateString('en-US', options);
+        if (!dateStr) return '';
+        return new Date(dateStr).toLocaleDateString('en-US', {
+            weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
+        });
     };
 
     return (
@@ -62,7 +53,7 @@ const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
             <div className="item-modal-content">
                 <header className="modal-header">
                     <div className="modal-logo">
-                        <img src={Logo} alt="Logo" style={{height: '2.5rem'}}/> 
+                        <img src={Logo} alt="Logo" style={{ height: '2rem' }} />
                         Scheduler
                     </div>
                     <button className="close-btn" onClick={onClose}>
@@ -71,61 +62,78 @@ const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
                 </header>
 
                 <div className="modal-body">
-                    <h1 className="task-display-title">{task?.title}</h1>
+                    {/* Completed banner */}
+                    {isCompleted && (
+                        <div className="completed-status-banner">
+                            <CheckCircle2 size={16} />
+                            This task has been marked as completed.
+                        </div>
+                    )}
+
+                    <h1 className={`task-display-title ${isCompleted ? 'is-completed' : ''}`}>
+                        {task?.title}
+                    </h1>
 
                     <div className="meta-info-grid">
                         <div className="meta-pill">
-                            <Tag size={14} className="icon-pink" />
+                            <Tag size={14} />
                             <span className="label">Category:</span>
                             <span className="value-badge">{task?.category}</span>
                         </div>
                         <div className="meta-pill">
-                            <Folder size={14} className="icon-purple" />
+                            <Folder size={14} />
                             <span className="label">Group:</span>
-                            <span className="value-badge">{task?.groupId?.name}</span>
+                            <span className="value-badge">{task?.groupId?.name || '—'}</span>
                         </div>
                     </div>
 
                     <div className="time-info-row">
                         <div className="time-pill">
                             <Calendar size={16} />
-                            {/* Display the formatted date here */}
                             <span>{formatFullDate(item.date)}</span>
                         </div>
                         <div className="time-pill">
                             <Clock size={16} />
-                            <span>{item.time}</span>
+                            <span>{item.time || '—'}</span>
                         </div>
                     </div>
 
                     <div className="detail-list">
                         <div className="detail-item">
                             <span className="detail-label">Owner:</span>
-                            <span className="detail-value">Mark Sharmy</span>
+                            <span className="detail-value">{profile?.username || '—'}</span>
                         </div>
                         <div className="detail-item">
                             <span className="detail-label">Subtask:</span>
-                            <span className="detail-value">{item.subtaskId ? 'Yes' : 'No'}</span>
+                            <span className="detail-value">{isSubtask ? 'Yes' : 'No'}</span>
                         </div>
                         <div className="detail-item">
                             <span className="detail-label">Status:</span>
-                            <span className="detail-value status-text">{task?.status}</span>
+                            <span className={`detail-value status-text ${isCompleted ? 'completed' : ''}`}>
+                                {task?.status}
+                            </span>
                         </div>
                     </div>
 
                     <div className="action-footer">
-                        <button className="btn-action complete" onClick={handleComplete}>
-                            <CheckCircle2 size={16} /> Complete
+                        <button
+                            className="btn-action complete"
+                            onClick={handleComplete}
+                            disabled={isCompleted}
+                            title={isCompleted ? 'Already completed' : 'Mark as complete'}
+                        >
+                            <CheckCircle2 size={16} />
+                            {isCompleted ? 'Completed' : 'Complete'}
                         </button>
-                        
+
                         <button className="btn-action shelve" onClick={handleShelve}>
                             <Archive size={16} /> Shelve
                         </button>
-                        
+
                         <button className="btn-action remove" onClick={handleRemove}>
                             <Trash2 size={16} /> Remove
                         </button>
-                        
+
                         <button className="btn-action cancel" onClick={onClose}>
                             Cancel
                         </button>

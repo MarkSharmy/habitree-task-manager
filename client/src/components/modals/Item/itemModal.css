@@ -13,10 +13,31 @@
     margin-bottom: 1.2rem;
 }
 
+/* Completed title style */
+.task-display-title.is-completed {
+    text-decoration: line-through;
+    color: #94a3b8;
+}
+
+.completed-status-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #16a34a;
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
 .meta-info-grid {
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
 .meta-pill {
@@ -38,6 +59,7 @@
     display: flex;
     gap: 0.8rem;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .time-pill {
@@ -67,6 +89,7 @@
     width: 5rem;
     color: #64748b;
     font-weight: 500;
+    flex-shrink: 0;
 }
 
 .detail-value {
@@ -78,11 +101,16 @@
     font-weight: 600;
 }
 
+.status-text.completed {
+    color: #16a34a;
+}
+
 .action-footer {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
     padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
 }
 
 .btn-action {
@@ -96,12 +124,22 @@
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid transparent;
+    font-family: 'Rubik', sans-serif;
 }
 
 .btn-action.complete {
     background: #f0fdf4;
     color: #16a34a;
     border-color: #bbf7d0;
+}
+
+/* Disabled/muted style when task is already completed */
+.btn-action.complete:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 .btn-action.shelve {
@@ -122,18 +160,28 @@
     border-color: #e2e8f0;
 }
 
-.btn-action:hover {
+.btn-action:hover:not(:disabled) {
     filter: brightness(0.95);
 }
 
-/* Tablet and Mobile adjustments */
+/* Mobile */
 @media (max-width: 48rem) {
     .item-modal-content {
-        width: 95%;
-        padding: 1rem;
+        width: 100%;
+        border-radius: 1.25rem 1.25rem 0 0;
+        padding: 1.25rem 1rem 2rem;
     }
-    
+
+    .modal-overlay {
+        align-items: flex-end;
+    }
+
     .action-footer {
+        justify-content: stretch;
+    }
+
+    .btn-action {
+        flex: 1;
         justify-content: center;
     }
 }
