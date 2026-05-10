@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { updateTaskStatus } from '../../../store/slices/taskSlice';
-import { removeTaskFromPlanner } from '../../../store/slices/plannerSlice';
+import { removeTaskFromPlanner, fetchPlannerByDate } from '../../../store/slices/plannerSlice';
 import {
     X, Tag, Folder, Calendar, Clock,
     CheckCircle2, Archive, Trash2
@@ -21,8 +21,11 @@ const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
     /* Mark as complete — stays in planner, visually highlighted */
     const handleComplete = async () => {
         if (!isSubtask) {
-            await dispatch(updateTaskStatus({ id: task._id, status: 'Completed' }));
+            await dispatch(updateTaskStatus({ id: task._id, status: 'Completed' })).unwrap();
         }
+        // Refetch the planner so dayData.tasks gets the updated task status,
+        // triggering an immediate re-render of PlannerItem without a page refresh
+        await dispatch(fetchPlannerByDate(activeDate));
         onClose();
     };
 
