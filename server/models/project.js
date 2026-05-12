@@ -14,6 +14,7 @@ const projectSchema = new mongoose.Schema({
         frontendBacklog: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
         mobileBacklog: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
         design: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+        issues: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
         todo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
         doing: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
         testing: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],

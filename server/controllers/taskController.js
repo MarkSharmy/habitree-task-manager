@@ -130,6 +130,7 @@ exports.deleteTask = async (req, res) => {
                     "kanban.doing": taskId,
                     "kanban.done": taskId,
                     "kanban.testing": taskId,
+                    "kanban.issues": taskId,
                     "kanban.blocked": taskId,
                     "kanban.onHold": taskId,
                     "kanban.trash": taskId,
@@ -216,5 +217,3 @@ exports.updateTaskStatus = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
-
-

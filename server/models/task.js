@@ -34,7 +34,7 @@ const TaskSchema = new mongoose.Schema({
         type: String,
         enum: [
             'Todo', 'Doing', 'Done', 'Testing',
-            'backendBacklog', 'frontendBacklog', 'mobileBacklog', 'design'
+            'backendBacklog', 'frontendBacklog', 'mobileBacklog', 'design', 'issues'
         ],
         default: 'Todo'
     },
@@ -70,4 +70,3 @@ TaskSchema.post('save', async function(doc) {
 });
 
 module.exports = mongoose.model('Task', TaskSchema);
-

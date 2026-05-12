@@ -126,7 +126,7 @@ const KanbanCard = ({ task, index }) => {
                         onClose={() => setIsMoveModalOpen(false)}
                         task={task}
                         onMove={handleMoveTask}
-                        columnKeys={['backendBacklog', 'frontendBacklog', 'mobileBacklog', 'design', 'todo', 'doing', 'testing', 'done']}
+                        columnKeys={['backendBacklog', 'frontendBacklog', 'mobileBacklog', 'design', 'issues', 'todo', 'doing', 'testing', 'done']}
                     />
                     <Snackbar 
                         open={snackbarOpen} 

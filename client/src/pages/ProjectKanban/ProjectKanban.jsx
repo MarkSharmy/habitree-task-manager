@@ -2,18 +2,10 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { BarLoader, PulseLoader } from 'react-spinners';
-import { DragDropContext } from '@hello-pangea/dnd';
-import { fetchSingleProject, moveTaskBetweenColumns } from '../../store/slices/projectSlice';
+import { DragDropContext } from '@hello-pangea/dnd'; // Added
+import { fetchSingleProject, moveTaskBetweenColumns } from '../../store/slices/projectSlice'; // Added moveTask
 import KanbanColumn from '../../components/project/KanbanColumn/KanbanColumn';
 import './projectKanban.css';
-
-const COLUMN_KEYS = [
-    'backendBacklog', 'frontendBacklog', 'mobileBacklog',
-    'design', 'todo', 'doing', 'testing', 'done'
-];
-
-const formatColumnTitle = (key) =>
-    key.replace(/([A-Z])/g, ' $1').toUpperCase();
 
 const ProjectKanban = () => {
     const { id } = useParams();
@@ -25,21 +17,27 @@ const ProjectKanban = () => {
     }, [id, dispatch]);
 
     if (loading || !currentProject) return (
-        <div className="details-loader-container">
-            <BarLoader color="#22c55e" />
-        </div>
+        <div className="details-loader-container"><BarLoader color="#22c55e" /></div>
     );
+
+    const columnKeys = [
+        'backendBacklog', 'frontendBacklog', 'mobileBacklog', 
+        'design', 'issues', 'todo', 'doing', 'testing', 'done'
+    ];
 
     const onDragEnd = (result) => {
         const { destination, source, draggableId } = result;
-        if (!destination) return;
-        if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+
+        if (!destination || (
+            destination.droppableId === source.droppableId &&
+            destination.index === source.index
+        )) return;
 
         dispatch(moveTaskBetweenColumns({
             projectId: currentProject._id,
             taskId: draggableId,
             fromColumn: source.droppableId,
-            toColumn: destination.droppableId,
+            toColumn: destination.droppableId
         }));
     };
 
@@ -54,11 +52,11 @@ const ProjectKanban = () => {
                     <div className="header-right">
                         <div className="collaborator-avatars">
                             {currentProject.collaborators?.map(user => (
-                                <img
-                                    key={user._id}
-                                    src={user.avatar || '/default-avatar.png'}
-                                    alt={user.username}
-                                    className="collab-img"
+                                <img 
+                                    key={user._id} 
+                                    src={user.avatar || '/default-avatar.png'} 
+                                    alt={user.username} 
+                                    className="collab-img" 
                                 />
                             ))}
                         </div>
@@ -74,17 +72,17 @@ const ProjectKanban = () => {
                 <div className="kanban-board-wrapper">
                     {moveLoading && (
                         <div className="kanban-move-overlay">
-                            <PulseLoader color="#22c55e" size={12} />
+                            <PulseLoader color="#22c55e" size={15} />
                             <p>Updating Board...</p>
                         </div>
                     )}
 
                     <div className={`kanban-board ${moveLoading ? 'board-blur' : ''}`}>
-                        {COLUMN_KEYS.map(key => (
-                            <KanbanColumn
-                                key={key}
-                                title={formatColumnTitle(key)}
-                                tasks={currentProject.kanban[key]}
+                        {columnKeys.map(key => (
+                            <KanbanColumn 
+                                key={key} 
+                                title={key.replace(/([A-Z])/g, ' $1').toUpperCase()} 
+                                tasks={currentProject.kanban[key]} 
                                 columnId={key}
                             />
                         ))}

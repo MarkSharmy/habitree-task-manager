@@ -8,6 +8,7 @@ import SessionModal from '../../components/modals/Session/SessionModal';
 import PlannerItem from '../../components/dashboard/PlannerItem/PlannerItem';
 import EfficiencyWidget from '../../components/dashboard/EfficiencyWidget/EfficiencyWidget';
 import ItemModal from '../../components/modals/Item/ItemModal';
+import AddMinutesModal from '../../components/modals/Session/AddMinutesModal';
 
 import { fetchTodayStats } from '../../store/slices/statsSlice';
 import { saveWorkSession } from '../../store/slices/sessionSlice';
@@ -20,11 +21,13 @@ const Dashboard = () => {
 
     const { activeDate, dayData, loading: plannerLoading } = useSelector((state) => state.planner);
     const { efficiencyScore, totalProductivityMinutes, sessionsCount, loading: statsLoading } = useSelector((state) => state.stats);
+    const { saving } = useSelector((state) => state.session);
 
     const [selectedPlannerItem, setSelectedPlannerItem] = useState(null);
     const [isItemModalOpen, setIsItemModalOpen] = useState(false);
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [isActiveModalOpen, setActiveModalOpen] = useState(false);
+    const [isAddMinutesOpen, setAddMinutesOpen] = useState(false);
     const [sessionTime, setSessionTime] = useState(0);
 
     const formatMinutes = (mins) => {
@@ -64,6 +67,22 @@ const Dashboard = () => {
 
     const isToday = activeDate === new Date().toISOString().split('T')[0];
 
+    const handleAddMinutes = async (minutes) => {
+        const endTime = new Date();
+        const startTime = new Date(endTime.getTime() - minutes * 60 * 1000);
+        try {
+            await dispatch(saveWorkSession({
+                startTime: startTime.toISOString(),
+                endTime: endTime.toISOString(),
+                durationMinutes: minutes,
+            })).unwrap();
+            dispatch(fetchTodayStats(activeDate));
+            setAddMinutesOpen(false);
+        } catch (err) {
+            console.error('Failed to save minutes:', err);
+        }
+    };
+
     if (statsLoading || plannerLoading) return (
         <div className="details-loader-container">
             <BarLoader color="#3b82f6" />
@@ -89,7 +108,7 @@ const Dashboard = () => {
                         onClick={() => handleDateStep(1)}
                     />
                 </div>
-                <button className="quick-add-btn">+ Quick Add</button>
+                <button className="quick-add-btn" onClick={() => setAddMinutesOpen(true)}>+ Add Minutes</button>
             </div>
 
             <div className="dashboard-grid">
@@ -189,6 +208,14 @@ const Dashboard = () => {
                 item={selectedPlannerItem}
                 activeDate={activeDate}
                 onStatusUpdate={handleStatusUpdate}
+            />
+
+            <AddMinutesModal
+                isOpen={isAddMinutesOpen}
+                onClose={() => setAddMinutesOpen(false)}
+                onAdd={handleAddMinutes}
+                loading={saving}
+                activeDate={activeDate}
             />
         </div>
     );

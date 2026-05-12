@@ -33,7 +33,7 @@ exports.getSingleProject = async (req, res) => {
     try {
         const project = await Project.findById(req.params.id)
             .populate({
-                path: 'kanban.backendBacklog kanban.frontendBacklog kanban.mobileBacklog kanban.design kanban.todo kanban.doing kanban.testing kanban.done',
+                path: 'kanban.backendBacklog kanban.frontendBacklog kanban.mobileBacklog kanban.design kanban.issues kanban.todo kanban.doing kanban.testing kanban.done',
                 model: 'Task',
                 populate: {
                     path: 'userId',

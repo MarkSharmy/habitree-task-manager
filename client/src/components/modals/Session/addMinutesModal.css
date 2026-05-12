@@ -1,0 +1,218 @@
+.add-minutes-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.add-minutes-modal {
+    background: white;
+    width: 100%;
+    max-width: 22rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.add-minutes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.125rem 1.5rem;
+    border-bottom: 1.5px solid var(--grey-bd);
+}
+
+.add-minutes-header h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--dark-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.add-minutes-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.add-minutes-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dark-text);
+    display: block;
+    margin-bottom: 0.4rem;
+}
+
+/* Large centred number input */
+.minutes-input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.minutes-stepper-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--grey-bd);
+    background: white;
+    color: var(--soft-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.minutes-stepper-btn:hover {
+    border-color: var(--btn-blue);
+    color: var(--btn-blue);
+}
+
+.minutes-stepper-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.minutes-number-input {
+    width: 5rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-text);
+    border: 1.5px solid var(--grey-bd);
+    border-radius: 0.625rem;
+    padding: 0.5rem 0.25rem;
+    background: var(--input-bg);
+    font-family: 'Rubik', sans-serif;
+    outline: none;
+    -moz-appearance: textfield;
+}
+
+.minutes-number-input:focus {
+    border-color: var(--btn-blue);
+}
+
+/* Hide browser spin arrows */
+.minutes-number-input::-webkit-outer-spin-button,
+.minutes-number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.minutes-unit-label {
+    font-size: 0.875rem;
+    color: var(--light-text);
+    font-weight: 500;
+}
+
+/* Quick-pick chips */
+.quick-pick-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.quick-pick-chip {
+    padding: 0.35rem 0.875rem;
+    border: 1.5px solid var(--grey-bd);
+    border-radius: 2rem;
+    background: white;
+    color: var(--soft-text);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Rubik', sans-serif;
+    transition: all 0.15s;
+}
+
+.quick-pick-chip:hover {
+    border-color: var(--btn-blue);
+    color: var(--btn-blue);
+    background: #eff6ff;
+}
+
+.quick-pick-chip.active {
+    border-color: var(--btn-blue);
+    color: var(--btn-blue);
+    background: #eff6ff;
+    font-weight: 600;
+}
+
+.add-minutes-hint {
+    font-size: 0.75rem;
+    color: var(--light-text);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.add-minutes-error {
+    font-size: 0.775rem;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.add-minutes-footer {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1.125rem 1.5rem;
+    border-top: 1.5px solid var(--grey-bd);
+}
+
+.btn-add-minutes-cancel {
+    flex: 1;
+    padding: 0.7rem;
+    border: 1.5px solid var(--grey-bd);
+    border-radius: 0.5rem;
+    background: white;
+    color: var(--soft-text);
+    font-size: 0.875rem;
+    cursor: pointer;
+    font-family: 'Rubik', sans-serif;
+}
+
+.btn-add-minutes-submit {
+    flex: 2;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: var(--btn-blue);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Rubik', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: background 0.15s;
+}
+
+.btn-add-minutes-submit:hover { background: var(--btn-blue-hover); }
+.btn-add-minutes-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+@media (max-width: 48rem) {
+    .add-minutes-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .add-minutes-modal {
+        border-radius: 1.25rem 1.25rem 0 0;
+        max-width: 100%;
+    }
+}
