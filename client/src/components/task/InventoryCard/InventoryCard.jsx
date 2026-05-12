@@ -1,11 +1,20 @@
 import { Calendar as CalendarIcon, Folder } from 'lucide-react';
 import './inventoryCard.css';
 
-const InventoryCard = ({ title, category, progress, date, status, groupColor }) => {
+const calcProgress = (subtasks, status) => {
+    if (subtasks && subtasks.length > 0) {
+        const completed = subtasks.filter(s => s.isCompleted).length;
+        return Math.round((completed / subtasks.length) * 100);
+    }
+    return status === 'Completed' ? 100 : 0;
+};
+
+const InventoryCard = ({ title, category, subtasks, status, date, groupColor }) => {
+    const progress = calcProgress(subtasks, status);
+
     return (
         <div className="inventory-card">
             <div className="card-top">
-                {/* Use groupColor directly, with a fallback if undefined */}
                 <div 
                     className="icon-box" 
                     style={{ backgroundColor: groupColor || '#3b82f6' }}
@@ -31,7 +40,7 @@ const InventoryCard = ({ title, category, progress, date, status, groupColor }) 
                             className="progress-bar-fill" 
                             style={{ 
                                 width: `${progress}%`,
-                                backgroundColor: groupColor || '#3b82f6' // Matches bar color to group icon
+                                backgroundColor: groupColor || '#3b82f6'
                             }}
                         ></div>
                     </div>

@@ -111,9 +111,9 @@ const TaskInventory = () => {
                                         <InventoryCard 
                                             title={task.title}
                                             category={task.category}
-                                            progress={task.progress || 0}
-                                            date={task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Unscheduled'}
+                                            subtasks={task.subtasks || []}
                                             status={task.status}
+                                            date={task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Unscheduled'}
                                             groupColor={group.color}
                                         />
                                     </div>
