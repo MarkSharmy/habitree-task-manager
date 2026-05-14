@@ -16,27 +16,20 @@
 .task-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 2rem;
-    gap: 1rem;
-    flex-wrap: wrap;
 }
 
 .task-title-area {
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex: 1;
-    min-width: 0;
 }
 
 .task-title-area h1 {
     font-size: 1.5rem;
     font-weight: 500;
     color: var(--dark-text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .category-icon-large {
@@ -46,21 +39,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
 }
 
-.category-icon-large.general  { background-color: #394546f8; }
-.category-icon-large.watch    { background-color: #e84393; }
+.category-icon-large.general { background-color: #394546f8; }
+.category-icon-large.watch { background-color: #e84393; }
 .category-icon-large.practice { background-color: #6c5ce7; }
-.category-icon-large.read     { background-color: #191b81; }
-.category-icon-large.note     { background-color: #f39c12; }
+.category-icon-large.read { background-color: #191b81; }
+.category-icon-large.note { background-color: #f39c12; }
 
 .header-actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.75rem;
-    flex-shrink: 0;
+    gap: 1rem;
 }
 
 .btn-add-schedule {
@@ -71,10 +62,7 @@
     padding: 0.5rem 1rem;
     display: flex;
     align-items: center;
-    gap: 0.4rem;
     cursor: pointer;
-    font-size: 0.875rem;
-    white-space: nowrap;
 }
 
 .btn-add-schedule:hover {
@@ -82,22 +70,19 @@
 }
 
 .btn-icon-settings {
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 1rem;
     border: 2px solid var(--grey-bd);
     border-radius: 0.75rem;
     background: white;
     color: var(--soft-text);
     cursor: pointer;
-    display: flex;
-    align-items: center;
 }
 
-/* Stack layout on desktop */
 .task-content-grid {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 1.5rem;
+    align-items:flex-start;
+    gap: 2rem;
 }
 
 .main-info-panel {
@@ -105,40 +90,31 @@
     border: 2px solid var(--grey-bd);
     border-radius: 1.25rem;
     padding: 1.5rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     height: 70vh;
     flex: 2;
-    min-width: 0;
-    overflow-y: auto;
 }
 
 textarea {
-    width: 100%;
-    box-sizing: border-box;
+    width: 90%;
     height: 8rem;
-    padding: 0.75rem 1rem;
+    padding: 1rem;
     border: 2px solid var(--grey-bd);
     border-radius: 0.5rem;
     resize: none;
     margin-top: 0.5rem;
-    font-family: 'Rubik', sans-serif;
-    font-size: 0.875rem;
 }
 
 .subtasks-section label {
-    margin-top: 1rem;
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--dark-text);
+    margin-top: 1rem
 }
 
 .subtasks-container {
     display: flex;
     flex-direction: column;
-    margin-top: 0.75rem;
-    max-height: 12rem;
-    overflow-y: auto;
+    margin-top: 1rem;
+    height: 8.5rem;
+    overflow-y: scroll;
     gap: 0.5rem;
 }
 
@@ -146,14 +122,13 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.4rem 0.75rem;
+    padding: 0.25rem 1rem;
     border: 1px solid var(--grey-bd);
     border-radius: 0.5rem;
     background-color: #f8fafc;
     color: var(--soft-text);
     font-size: 0.875rem;
     cursor: pointer;
-    gap: 0.5rem;
 }
 
 .detail-subtask-item.completed {
@@ -171,8 +146,6 @@ textarea {
     align-items: center;
     justify-content: flex-start;
     gap: 0.5rem;
-    flex: 1;
-    min-width: 0;
 }
 
 .subtask-right {
@@ -180,9 +153,9 @@ textarea {
     align-items: center;
     justify-content: flex-end;
     gap: 0.25rem;
-    flex-shrink: 0;
 }
 
+/* Toggle switch for subtask completion */
 .subtask-toggle {
     position: relative;
     display: inline-block;
@@ -200,7 +173,10 @@ textarea {
 
 .subtask-toggle-slider {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: #cbd5e1;
     border-radius: 999px;
     transition: background-color 0.2s ease;
@@ -239,12 +215,15 @@ textarea {
     background: white;
     color: var(--soft-text);
     cursor: pointer;
-    display: flex;
-    align-items: center;
 }
 
-.btn-sub-action:hover { color: var(--primary); }
-.btn-sub-action.delete:hover { color: #ef4444; }
+.btn-sub-action:hover {
+    color: var(--primary);
+}
+
+.btn-sub-action.delete:hover {
+    color: #ef4444;
+}
 
 .add-subtask-footer {
     margin-top: 1rem;
@@ -255,25 +234,19 @@ textarea {
 }
 
 .add-subtask-footer input {
-    flex: 1;
-    padding: 0.6rem 0.75rem;
-    border: 2px solid var(--grey-bd);
-    border-radius: 0.5rem;
-    background: var(--input-bg);
-    font-size: 0.875rem;
+    flex: 2;
+    width: 100%;
+    padding: 0.7rem;
     outline: none;
-    min-width: 0;
 }
 
 .btn-add-subtask {
-    padding: 0.6rem 0.875rem;
+    padding: 0.65rem;
     border: none;
     border-radius: 0.5rem;
     background: rgb(206, 206, 206);
     color: var(--dark-text);
     cursor: pointer;
-    white-space: nowrap;
-    font-size: 0.85rem;
 }
 
 .subtask-edit-input {
@@ -282,25 +255,18 @@ textarea {
     outline: none;
     width: 100%;
     background: transparent;
-    font-size: 0.875rem;
-    font-family: 'Rubik', sans-serif;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-/* Metadata sidebar */
 .metadata-sidebar {
     background: white;
     border: 2px solid var(--grey-bd);
     border-radius: 1.25rem;
     padding: 1rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    height: 72vh;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    flex: 1;
-    min-width: 14rem;
 }
 
 .meta-item {
@@ -310,7 +276,6 @@ textarea {
     margin-bottom: 1.25rem;
     font-size: 0.875rem;
     gap: 0.5rem;
-    flex-wrap: wrap;
 }
 
 .meta-label {
@@ -320,7 +285,9 @@ textarea {
     gap: 0.5rem;
 }
 
-.meta-value.text { color: var(--soft-text); }
+.meta-value.text {
+    color: var(--soft-text);
+}
 
 .meta-value.badge {
     color: var(--soft-text);
@@ -338,18 +305,22 @@ textarea {
 }
 
 .progress-card {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
 }
 
 .progress-card label {
     color: var(--soft-text);
-    font-size: 0.875rem;
 }
 
 .circular-chart {
     display: block;
-    margin: 1rem auto;
-    max-width: 7rem;
+    margin: 1.5rem auto;
+    max-width: 8rem;
+}
+
+.circular-progress {
+    margin-top: 2.5rem;
+    width: 100%;
 }
 
 .circle-bg {
@@ -383,17 +354,17 @@ textarea {
     margin-top: 0.5rem;
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
+    border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 100;
-    min-width: 8.75rem;
+    min-width: 140px;
     padding: 0.4rem;
 }
 
 .dropdown-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
     width: 100%;
     padding: 0.6rem 0.8rem;
     border: none;
@@ -401,104 +372,149 @@ textarea {
     font-size: 0.85rem;
     color: #475569;
     cursor: pointer;
-    border-radius: 0.25rem;
+    border-radius: 4px;
     transition: background 0.2s;
-    font-family: 'Rubik', sans-serif;
 }
 
-.dropdown-item:hover { background: #f8fafc; }
-.dropdown-item.delete { color: #ef4444; }
-.dropdown-item.delete:hover { background: #fef2f2; }
+.dropdown-item:hover {
+    background: #f8fafc;
+}
 
-/* ── MOBILE ── */
+.dropdown-item.delete {
+    color: #ef4444;
+}
+
+.dropdown-item.delete:hover {
+    background: #fef2f2;
+}
+/* ── CSV Import ── */
+.csv-drop-zone {
+    margin-top: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 0.5rem;
+    color: var(--light-text);
+    font-size: 0.775rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #fafafa;
+    text-align: center;
+}
+
+.csv-drop-zone:hover,
+.csv-drop-zone.drag-over {
+    border-color: var(--btn-blue);
+    color: var(--btn-blue);
+    background: #eff6ff;
+}
+
+.csv-preview-panel {
+    margin-top: 0.875rem;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 0.5rem;
+    background: #f0fdf4;
+    overflow: hidden;
+}
+
+.csv-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.875rem;
+    border-bottom: 1px solid #bbf7d0;
+}
+
+.csv-preview-title {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.775rem;
+    font-weight: 600;
+    color: #166534;
+}
+
+.csv-cancel-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0.1rem;
+    border-radius: 0.25rem;
+    transition: color 0.15s;
+}
+
+.csv-cancel-btn:hover {
+    color: #ef4444;
+}
+
+.csv-preview-list {
+    list-style: none;
+    padding: 0.5rem 0.875rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-height: 10rem;
+    overflow-y: auto;
+}
+
+.csv-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.775rem;
+    color: #166534;
+}
+
+.csv-preview-more {
+    font-size: 0.725rem;
+    color: #64748b;
+    padding-left: 1.25rem;
+}
+
+.csv-confirm-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.625rem;
+    background: #22c55e;
+    color: white;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Rubik', sans-serif;
+    transition: background 0.15s;
+}
+
+.csv-confirm-btn:hover {
+    background: #16a34a;
+}
+
+.csv-error-msg {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #ef4444;
+    padding: 0.4rem 0.5rem;
+    background: #fef2f2;
+    border-radius: 0.375rem;
+    border: 1px solid #fecaca;
+}
+
 @media (max-width: 48rem) {
-    .task-details-container {
-        padding: 0.75rem;
-    }
-
-    .task-header {
-        margin-bottom: 1rem;
-        align-items: center;
-    }
-
-    .task-title-area h1 {
-        font-size: 1.1rem;
-    }
-
-    .category-icon-large {
-        width: 2rem;
-        height: 2rem;
-        border-radius: 0.5rem;
-    }
-
-    /* Hide the text label on the schedule button, show icon only */
-    .btn-add-schedule span {
-        display: none;
-    }
-
-    .btn-add-schedule {
-        padding: 0.5rem 0.6rem;
-    }
-
-    /* Full-width stacked layout */
-    .task-content-grid {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .main-info-panel {
-        height: auto;
-        max-height: 60vh;
-        flex: none;
-        width: 100%;
-        box-sizing: border-box;
-        padding: 1rem;
-    }
-
-    textarea {
-        height: 6rem;
-    }
-
-    .subtasks-container {
-        max-height: 10rem;
-    }
-
-    .add-subtask-footer {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .btn-add-subtask {
-        width: 100%;
-        text-align: center;
-    }
-
-    /* Metadata sidebar goes below, horizontal scroll for meta items */
-    .metadata-sidebar {
-        flex: none;
-        width: 100%;
-        box-sizing: border-box;
-        height: auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        align-items: flex-start;
-    }
-
-    .meta-list {
-        flex: 1;
-        min-width: 10rem;
-    }
-
-    .progress-card {
-        flex: 1;
-        min-width: 8rem;
-        text-align: center;
-        margin-bottom: 0;
-    }
-
-    .circular-chart {
-        max-width: 5rem;
-        margin: 0.5rem auto 0;
+    .csv-drop-zone {
+        font-size: 0.725rem;
+        padding: 0.625rem 0.75rem;
     }
 }
