@@ -56,6 +56,33 @@ export const addTaskToColumn = createAsyncThunk(
     }
 );
 
+// Accepts an array of title strings and creates one task per title in sequence.
+// Each fulfilled action updates the Redux column immediately so the UI fills
+// in real time rather than waiting for all requests to finish.
+export const addTasksFromCSV = createAsyncThunk(
+    'projects/addTasksFromCSV',
+    async ({ projectId, columnId, titles }, { dispatch, rejectWithValue }) => {
+        try {
+            const results = [];
+            for (const title of titles) {
+                const response = await API.post(`/projects/${projectId}/add-task`, {
+                    columnId,
+                    title,
+                });
+                results.push({ newTask: response.data.task, columnId });
+                // Push each task into the column immediately as it arrives
+                dispatch({
+                    type: 'projects/addTask/fulfilled',
+                    payload: { newTask: response.data.task, columnId },
+                });
+            }
+            return results;
+        } catch (error) {
+            return rejectWithValue(error.response?.data);
+        }
+    }
+);
+
 export const updateTask = createAsyncThunk(
     'projects/updateTask',
     async ({ taskId, updates }, { rejectWithValue }) => {
