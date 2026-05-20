@@ -1,9 +1,9 @@
 import { useRef, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { MoreHorizontal, Plus, Upload, X, AlertCircle, Loader2 } from 'lucide-react';
+import { MoreHorizontal, Plus, Upload, X, AlertCircle, Loader2, Trash2 } from 'lucide-react';
 import { Droppable } from '@hello-pangea/dnd';
-import { addTaskToColumn, addTasksFromCSV } from '../../../store/slices/projectSlice';
+import { addTaskToColumn, addTasksFromCSV, deleteAllFromColumn } from '../../../store/slices/projectSlice';
 import KanbanCard from '../KanbanCard/KanbanCard';
 import './kanbanColumn.css';
 
@@ -119,6 +119,14 @@ const KanbanColumn = ({ title, tasks, columnId }) => {
     };
     // ──────────────────────────────────────────────────────────
 
+    const handleDeleteAll = () => {
+        setMenuOpen(false);
+        if (!tasks?.length) return;
+        if (!window.confirm(`Delete all ${tasks.length} task${tasks.length !== 1 ? 's' : ''} in "${title}"? This cannot be undone.`)) return;
+        const taskIds = tasks.map(t => t._id);
+        dispatch(deleteAllFromColumn({ projectId, columnId, taskIds }));
+    };
+
     return (
         <div className="kanban-column">
             <header className="column-header">
@@ -151,6 +159,13 @@ const KanbanColumn = ({ title, tasks, columnId }) => {
                                     }}
                                 >
                                     <Upload size={14} /> Import from CSV
+                                </button>
+                                <button
+                                    className="column-dropdown-item column-dropdown-item--danger"
+                                    onClick={handleDeleteAll}
+                                    disabled={!tasks?.length}
+                                >
+                                    <Trash2 size={14} /> Delete All
                                 </button>
                             </div>
                         )}

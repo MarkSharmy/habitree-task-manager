@@ -146,6 +146,20 @@
     color: var(--btn-blue);
 }
 
+.column-dropdown-item--danger {
+    color: #ef4444;
+}
+
+.column-dropdown-item--danger:hover {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.column-dropdown-item:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 /* ── CSV import bar (below column header) ── */
 .csv-import-bar {
     border-bottom: 1px solid #e2e8f0;

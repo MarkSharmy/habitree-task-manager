@@ -108,6 +108,21 @@ export const deleteTask = createAsyncThunk(
     }
 );
 
+// Deletes every task in a column sequentially, then clears the column in state.
+export const deleteAllFromColumn = createAsyncThunk(
+    'projects/deleteAllFromColumn',
+    async ({ projectId, columnId, taskIds }, { rejectWithValue }) => {
+        try {
+            for (const taskId of taskIds) {
+                await API.delete(`/tasks/${taskId}`);
+            }
+            return { columnId };
+        } catch (error) {
+            return rejectWithValue(error.response?.data);
+        }
+    }
+);
+
 export const moveTaskBetweenColumns = createAsyncThunk(
     'projects/moveTask',
     async ({ projectId, taskId, fromColumn, toColumn }, { rejectWithValue }) => {
@@ -214,6 +229,12 @@ const projectSlice = createSlice({
                     state.currentProject.kanban[columnId] = state.currentProject.kanban[columnId].filter(
                         t => t._id !== taskId
                     );
+                }
+            })
+            .addCase(deleteAllFromColumn.fulfilled, (state, action) => {
+                const { columnId } = action.payload;
+                if (state.currentProject?.kanban?.[columnId]) {
+                    state.currentProject.kanban[columnId] = [];
                 }
             })
             .addCase(moveTaskBetweenColumns.pending, (state) => {
