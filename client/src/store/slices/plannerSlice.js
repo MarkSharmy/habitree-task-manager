@@ -34,11 +34,22 @@ export const removeTaskFromPlanner = createAsyncThunk(
     'planner/removeTask',
     async ({ date, entryId }, { rejectWithValue }) => {
         try {
-            // Assuming your backend route is DELETE /planner/:date/:entryId
             await API.delete(`/planner/${date}/${entryId}`);
             return entryId;
         } catch (error) {
             return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const updatePlannerEntry = createAsyncThunk(
+    'planner/updateEntry',
+    async ({ date, entryId, time, comments }, { rejectWithValue }) => {
+        try {
+            const response = await API.patch(`/planner/${date}/${entryId}`, { time, comments });
+            return response.data.planner;
+        } catch (error) {
+            return rejectWithValue(error.response?.data);
         }
     }
 );
@@ -83,6 +94,9 @@ const plannerSlice = createSlice({
             })
             .addCase(removeTaskFromPlanner.fulfilled, (state, action) => {
             state.dayData.tasks = state.dayData.tasks.filter(t => t._id !== action.payload);
+            })
+            .addCase(updatePlannerEntry.fulfilled, (state, action) => {
+                state.dayData = action.payload;
             })
     }
 })

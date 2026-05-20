@@ -98,3 +98,34 @@ exports.deletePlannerTask = async (req, res) => {
         });
     }
 };
+// @desc    Update a planner entry's time (and optionally comments)
+// @route   PATCH /api/planner/:date/:id
+exports.updatePlannerEntry = async (req, res) => {
+    try {
+        const { date, id } = req.params;
+        const { time, comments } = req.body;
+        const userId = req.user.id;
+
+        const planner = await Planner.findOneAndUpdate(
+            { userId, date, 'tasks._id': id },
+            {
+                $set: {
+                    ...(time     !== undefined && { 'tasks.$.time': time }),
+                    ...(comments !== undefined && { 'tasks.$.comments': comments }),
+                },
+            },
+            { new: true }
+        ).populate({
+            path: 'tasks.taskId',
+            populate: { path: 'groupId', select: 'name color' },
+        });
+
+        if (!planner) {
+            return res.status(404).json({ success: false, message: 'Planner entry not found' });
+        }
+
+        res.json({ success: true, planner });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

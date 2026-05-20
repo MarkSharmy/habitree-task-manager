@@ -125,7 +125,15 @@ const Dashboard = () => {
                         </div>
                         <div className="task-list">
                             {dayData?.tasks?.length > 0 ? (
-                                dayData.tasks.map((entry) => (
+                                [...dayData.tasks]
+                                    .sort((a, b) => {
+                                        // Entries without a time sort to the bottom
+                                        if (!a.time && !b.time) return 0;
+                                        if (!a.time) return 1;
+                                        if (!b.time) return -1;
+                                        return a.time.localeCompare(b.time);
+                                    })
+                                    .map((entry) => (
                                     <div
                                         key={entry._id}
                                         onClick={() => handleItemClick(entry)}

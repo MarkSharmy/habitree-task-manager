@@ -185,3 +185,76 @@
         justify-content: center;
     }
 }
+
+/* ── Editable time pill ── */
+.time-pill-editable {
+    cursor: default;
+    position: relative;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.time-pill-editable.editing {
+    border-color: var(--btn-blue);
+    background: #eff6ff;
+    gap: 0.3rem;
+}
+
+.time-edit-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    margin-left: 0.1rem;
+    transition: color 0.15s;
+}
+
+.time-edit-btn:hover {
+    color: var(--btn-blue);
+}
+
+.time-edit-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.875rem;
+    font-family: 'Rubik', sans-serif;
+    color: var(--dark-text);
+    width: 5.5rem;
+    padding: 0;
+}
+
+.time-edit-confirm,
+.time-edit-cancel {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.1rem;
+    border-radius: 0.2rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+}
+
+.time-edit-confirm {
+    color: #22c55e;
+}
+
+.time-edit-confirm:hover {
+    color: #16a34a;
+}
+
+.time-edit-confirm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.time-edit-cancel {
+    color: #94a3b8;
+}
+
+.time-edit-cancel:hover {
+    color: #ef4444;
+}

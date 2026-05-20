@@ -1,9 +1,10 @@
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateTaskStatus } from '../../../store/slices/taskSlice';
-import { removeTaskFromPlanner, fetchPlannerByDate } from '../../../store/slices/plannerSlice';
+import { removeTaskFromPlanner, fetchPlannerByDate, updatePlannerEntry } from '../../../store/slices/plannerSlice';
 import {
     X, Tag, Folder, Calendar, Clock,
-    CheckCircle2, Archive, Trash2
+    CheckCircle2, Archive, Trash2, Edit3, Check
 } from 'lucide-react';
 import Logo from '../../../assets/logo.png';
 import './itemModal.css';
@@ -12,24 +13,32 @@ const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
     const dispatch = useDispatch();
     const { profile } = useSelector(state => state.user);
 
+    const [editingTime, setEditingTime] = useState(false);
+    const [timeValue, setTimeValue]     = useState('');
+    const [savingTime, setSavingTime]   = useState(false);
+
+    // Sync local time state whenever the item changes
+    useEffect(() => {
+        if (item?.time) setTimeValue(item.time);
+        setEditingTime(false);
+    }, [item]);
+
     if (!isOpen || !item) return null;
 
-    const task = item.taskId;
-    const isSubtask = !!item.subtaskId;
+    const task        = item.taskId;
+    const isSubtask   = !!item.subtaskId;
     const isCompleted = task?.status === 'Completed';
 
-    /* Mark as complete — stays in planner, visually highlighted */
+    /* Mark as complete */
     const handleComplete = async () => {
         if (!isSubtask) {
             await dispatch(updateTaskStatus({ id: task._id, status: 'Completed' })).unwrap();
         }
-        // Refetch the planner so dayData.tasks gets the updated task status,
-        // triggering an immediate re-render of PlannerItem without a page refresh
         await dispatch(fetchPlannerByDate(activeDate));
         onClose();
     };
 
-    /* Shelve — remove from planner and mark task as Shelved */
+    /* Shelve */
     const handleShelve = async () => {
         await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
         if (!isSubtask) {
@@ -38,10 +47,31 @@ const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
         onClose();
     };
 
-    /* Remove — pulls it off the planner list only, no status change */
+    /* Remove from planner only */
     const handleRemove = async () => {
         await dispatch(removeTaskFromPlanner({ date: activeDate, entryId: item._id }));
         onClose();
+    };
+
+    /* Save edited time */
+    const handleSaveTime = async () => {
+        if (!timeValue || timeValue === item.time) {
+            setEditingTime(false);
+            return;
+        }
+        setSavingTime(true);
+        try {
+            await dispatch(updatePlannerEntry({
+                date: activeDate,
+                entryId: item._id,
+                time: timeValue,
+            })).unwrap();
+        } catch (err) {
+            console.error('Failed to update time:', err);
+        } finally {
+            setSavingTime(false);
+            setEditingTime(false);
+        }
     };
 
     const formatFullDate = (dateStr) => {
@@ -65,7 +95,6 @@ const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
                 </header>
 
                 <div className="modal-body">
-                    {/* Completed banner */}
                     {isCompleted && (
                         <div className="completed-status-banner">
                             <CheckCircle2 size={16} />
@@ -91,13 +120,52 @@ const ItemModal = ({ isOpen, onClose, item, activeDate }) => {
                     </div>
 
                     <div className="time-info-row">
+                        {/* Date pill — static */}
                         <div className="time-pill">
                             <Calendar size={16} />
                             <span>{formatFullDate(item.date)}</span>
                         </div>
-                        <div className="time-pill">
+
+                        {/* Time pill — editable */}
+                        <div className={`time-pill time-pill-editable ${editingTime ? 'editing' : ''}`}>
                             <Clock size={16} />
-                            <span>{item.time || '—'}</span>
+                            {editingTime ? (
+                                <>
+                                    <input
+                                        type="time"
+                                        className="time-edit-input"
+                                        value={timeValue}
+                                        onChange={(e) => setTimeValue(e.target.value)}
+                                        autoFocus
+                                    />
+                                    <button
+                                        className="time-edit-confirm"
+                                        onClick={handleSaveTime}
+                                        disabled={savingTime}
+                                        title="Save time"
+                                    >
+                                        <Check size={13} />
+                                    </button>
+                                    <button
+                                        className="time-edit-cancel"
+                                        onClick={() => { setEditingTime(false); setTimeValue(item.time || ''); }}
+                                        title="Cancel"
+                                    >
+                                        <X size={13} />
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <span>{timeValue || '—'}</span>
+                                    <button
+                                        className="time-edit-btn"
+                                        onClick={() => setEditingTime(true)}
+                                        title="Edit time"
+                                    >
+                                        <Edit3 size={12} />
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
 

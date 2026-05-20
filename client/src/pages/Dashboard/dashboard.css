@@ -3,6 +3,13 @@
     grid-template-columns: 2fr 15rem;
     gap: 1.5rem;
     margin: 0 auto;
+    /* Prevent grid from overflowing its container */
+    min-width: 0;
+}
+
+.planner-section {
+    min-width: 0;
+    overflow: hidden;
 }
 
 /* Planner Section */
@@ -39,6 +46,7 @@
     cursor: pointer;
     font-weight: 400;
     white-space: nowrap;
+    font-family: 'Rubik', sans-serif;
 }
 
 .quick-add-btn:hover {
@@ -51,6 +59,14 @@
     border: 0.0625rem solid #e0e0e0;
     padding: 1.5rem;
     height: 100%;
+    /* Critical: contain children, prevent overflow */
+    min-width: 0;
+    overflow: hidden;
+}
+
+.task-list {
+    /* Ensure each planner item can't push the card wider */
+    overflow: hidden;
 }
 
 .card-header {
@@ -73,6 +89,7 @@
     cursor: pointer;
     font-weight: 400;
     white-space: nowrap;
+    font-family: 'Rubik', sans-serif;
 }
 
 .start-session-btn:hover {
@@ -162,7 +179,6 @@
 }
 
 @media (max-width: 48rem) {
-    /* Compact header row */
     .planner-header {
         flex-wrap: wrap;
         gap: 0.75rem;
@@ -187,7 +203,7 @@
     }
 
     .planner-card {
-        padding: 1rem;
+        padding: 0.875rem;
     }
 
     .card-header {
@@ -200,9 +216,7 @@
         font-size: 0.85rem;
     }
 
-    /* Stats become a horizontal scroll strip on mobile */
     .stats-sidebar {
-        margin-top: 1rem;
         max-width: 100%;
         display: flex;
         flex-direction: row;
@@ -218,7 +232,7 @@
     }
 
     .stat-card {
-        min-width: 9rem;
+        min-width: 8.5rem;
         flex-shrink: 0;
     }
 
