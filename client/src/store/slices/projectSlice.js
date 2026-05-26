@@ -123,6 +123,38 @@ export const deleteAllFromColumn = createAsyncThunk(
     }
 );
 
+// Move a selection of tasks from their current columns to a target column.
+export const moveSelectedTasks = createAsyncThunk(
+    'projects/moveSelectedTasks',
+    async ({ projectId, tasks, toColumn }, { rejectWithValue }) => {
+        // tasks: [{ taskId, fromColumn }]
+        try {
+            for (const { taskId, fromColumn } of tasks) {
+                if (fromColumn === toColumn) continue;
+                await API.put(`/projects/${projectId}/move`, { taskId, fromColumn, toColumn });
+            }
+            return { tasks, toColumn };
+        } catch (error) {
+            return rejectWithValue(error.response?.data);
+        }
+    }
+);
+
+// Delete a selection of tasks (each may be in a different column).
+export const deleteSelectedTasks = createAsyncThunk(
+    'projects/deleteSelectedTasks',
+    async ({ taskIds }, { rejectWithValue }) => {
+        try {
+            for (const taskId of taskIds) {
+                await API.delete(`/tasks/${taskId}`);
+            }
+            return { taskIds };
+        } catch (error) {
+            return rejectWithValue(error.response?.data);
+        }
+    }
+);
+
 export const moveTaskBetweenColumns = createAsyncThunk(
     'projects/moveTask',
     async ({ projectId, taskId, fromColumn, toColumn }, { rejectWithValue }) => {
@@ -235,6 +267,32 @@ const projectSlice = createSlice({
                 const { columnId } = action.payload;
                 if (state.currentProject?.kanban?.[columnId]) {
                     state.currentProject.kanban[columnId] = [];
+                }
+            })
+            .addCase(moveSelectedTasks.fulfilled, (state, action) => {
+                const { tasks, toColumn } = action.payload;
+                if (!state.currentProject) return;
+                for (const { taskId, fromColumn } of tasks) {
+                    if (fromColumn === toColumn) continue;
+                    const col = state.currentProject.kanban[fromColumn];
+                    const taskObj = col?.find(t => t._id === taskId);
+                    if (taskObj) {
+                        state.currentProject.kanban[fromColumn] =
+                            col.filter(t => t._id !== taskId);
+                        state.currentProject.kanban[toColumn].push({
+                            ...taskObj,
+                            kanban: toColumn,
+                        });
+                    }
+                }
+            })
+            .addCase(deleteSelectedTasks.fulfilled, (state, action) => {
+                const { taskIds } = action.payload;
+                if (!state.currentProject) return;
+                const idSet = new Set(taskIds);
+                for (const col of Object.keys(state.currentProject.kanban)) {
+                    state.currentProject.kanban[col] =
+                        state.currentProject.kanban[col].filter(t => !idSet.has(t._id));
                 }
             })
             .addCase(moveTaskBetweenColumns.pending, (state) => {

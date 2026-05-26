@@ -1,13 +1,96 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; // Added for navigation
-import { Search, Plus, Filter } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Plus, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BarLoader } from 'react-spinners';
 import InventoryCard from '../../components/task/InventoryCard/InventoryCard';
 import CreateTaskModal from '../../components/modals/Task/CreateTaskModal';
 
 import { createNewTask, fetchInventoryTasks } from '../../store/slices/taskSlice';
 import './taskInventory.css';
+
+/* ── Scrollable group row with left/right nav buttons ── */
+const GroupRow = ({ group, onTaskClick, onNewTask }) => {
+    const scrollRef = useRef(null);
+    const [canScrollLeft, setCanScrollLeft]   = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
+
+    const checkScroll = () => {
+        const el = scrollRef.current;
+        if (!el) return;
+        setCanScrollLeft(el.scrollLeft > 4);
+        setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+    };
+
+    useEffect(() => {
+        checkScroll();
+        const el = scrollRef.current;
+        if (!el) return;
+        el.addEventListener('scroll', checkScroll, { passive: true });
+        const ro = new ResizeObserver(checkScroll);
+        ro.observe(el);
+        return () => { el.removeEventListener('scroll', checkScroll); ro.disconnect(); };
+    }, [group.tasks]);
+
+    const scroll = (dir) => {
+        const el = scrollRef.current;
+        if (!el) return;
+        el.scrollBy({ left: dir * 220, behavior: 'smooth' });
+    };
+
+    return (
+        <section className="group-section">
+            <div className="group-title">
+                <span className="accent-bar" style={{ backgroundColor: group.color }} />
+                <h2>{group.name}</h2>
+                <span className="count-badge">{group.tasks.length} TASKS</span>
+
+                {/* Scroll controls — only shown when content overflows */}
+                <div className="group-scroll-controls">
+                    <button
+                        className={`group-scroll-btn ${!canScrollLeft ? 'disabled' : ''}`}
+                        onClick={() => scroll(-1)}
+                        disabled={!canScrollLeft}
+                        aria-label="Scroll left"
+                    >
+                        <ChevronLeft size={14} />
+                    </button>
+                    <button
+                        className={`group-scroll-btn ${!canScrollRight ? 'disabled' : ''}`}
+                        onClick={() => scroll(1)}
+                        disabled={!canScrollRight}
+                        aria-label="Scroll right"
+                    >
+                        <ChevronRight size={14} />
+                    </button>
+                </div>
+            </div>
+
+            <div className="tasks-grid" ref={scrollRef}>
+                {group.tasks.map(task => (
+                    <div
+                        key={task._id}
+                        onClick={() => onTaskClick(task._id)}
+                        className="card-clickable-wrapper"
+                    >
+                        <InventoryCard
+                            title={task.title}
+                            category={task.category}
+                            subtasks={task.subtasks || []}
+                            status={task.status}
+                            date={task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Unscheduled'}
+                            groupColor={group.color}
+                        />
+                    </div>
+                ))}
+                <div className="new-task-placeholder" onClick={onNewTask}>
+                    <Plus size={24} />
+                    <span>NEW TASK</span>
+                </div>
+            </div>
+        </section>
+    );
+};
 
 const TaskInventory = () => {
     const dispatch = useDispatch();
@@ -36,16 +119,25 @@ const TaskInventory = () => {
 
     const filteredGroups = useMemo(() => {
         const query = searchQuery.toLowerCase().trim();
+
         const groupEntries = Object.entries(inventory)
             .filter(([_, tasks]) => tasks.length > 0)
             .map(([groupName, tasks]) => {
                 const groupMeta = tasks[0]?.groupId;
+                // Latest updatedAt (or createdAt fallback) across all tasks in the group
+                const lastUpdated = tasks.reduce((latest, task) => {
+                    const ts = new Date(task.updatedAt || task.createdAt || 0).getTime();
+                    return ts > latest ? ts : latest;
+                }, 0);
                 return {
                     name: groupName,
                     color: groupMeta?.color || '#64748b',
-                    tasks: tasks
+                    tasks,
+                    lastUpdated,
                 };
-            });
+            })
+            // Most recently updated group first
+            .sort((a, b) => b.lastUpdated - a.lastUpdated);
 
         if (!query) return groupEntries;
 
@@ -98,33 +190,12 @@ const TaskInventory = () => {
             <div className="inventory-content">
                 {filteredGroups.length > 0 ? (
                     filteredGroups.map((group) => (
-                        <section key={group.name} className="group-section">
-                            <div className="group-title">
-                                <span className="accent-bar" style={{ backgroundColor: group.color }}></span>
-                                <h2>{group.name}</h2>
-                                <span className="count-badge">{group.tasks.length} TASKS</span>
-                            </div>
-                            
-                            <div className="tasks-grid">
-                                {group.tasks.map(task => (
-                                    <div key={task._id} onClick={() => navigate(`/tasks/${task._id}`)} className="card-clickable-wrapper">
-                                        <InventoryCard 
-                                            title={task.title}
-                                            category={task.category}
-                                            subtasks={task.subtasks || []}
-                                            status={task.status}
-                                            date={task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Unscheduled'}
-                                            groupColor={group.color}
-                                        />
-                                    </div>
-                                ))}
-                                
-                                <div className="new-task-placeholder" onClick={() => setIsModalOpen(true)}>
-                                    <Plus size={24} />
-                                    <span>NEW TASK</span>
-                                </div>
-                            </div>
-                        </section>
+                        <GroupRow
+                            key={group.name}
+                            group={group}
+                            onTaskClick={(id) => navigate(`/tasks/${id}`)}
+                            onNewTask={() => setIsModalOpen(true)}
+                        />
                     ))
                 ) : (
                     <div className="no-results">

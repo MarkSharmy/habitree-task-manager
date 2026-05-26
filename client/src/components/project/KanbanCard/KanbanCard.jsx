@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Snackbar, Alert } from '@mui/material';
-import { MoreHorizontal, User, Check, X, Copy } from 'lucide-react'; // Added Copy icon
+import { MoreHorizontal, User, Check, X, Copy } from 'lucide-react';
 import { Draggable } from '@hello-pangea/dnd';
 import { updateTask, deleteTask, moveTaskBetweenColumns } from '../../../store/slices/projectSlice';
 import MoveCardModal from '../../modals/Project/MoveCardModal';
 import './kanbanCard.css';
 
-const KanbanCard = ({ task, index }) => {
+const KanbanCard = ({ task, index, isSelected = false, onToggleSelect }) => {
     const menuRef = useRef(null);
     const dispatch = useDispatch();
     const [showOptions, setShowOptions] = useState(false);
@@ -69,13 +69,21 @@ const KanbanCard = ({ task, index }) => {
         <Draggable draggableId={task._id} index={index}>
             {(provided, snapshot) => (
                 <div 
-                    className={`kanban-card ${snapshot.isDragging ? 'dragging' : ''}`}
+                    className={`kanban-card ${snapshot.isDragging ? 'dragging' : ''} ${isSelected ? 'card-selected' : ''}`}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     style={{ ...provided.draggableProps.style }}
                 >
                     <div className={`kanban-card-header ${showOptions ? 'extend' : 'shrink'}`}>
+                        {/* Selection checkbox */}
+                        <button
+                            className={`card-select-btn ${isSelected ? 'card-select-btn--active' : ''}`}
+                            onClick={(e) => { e.stopPropagation(); onToggleSelect?.(task._id); }}
+                            title={isSelected ? 'Deselect' : 'Select'}
+                        >
+                            {isSelected ? <Check size={11} /> : null}
+                        </button>
                         {isEditing ? (
                             <div className="edit-mode-container">
                                 <input 
@@ -126,7 +134,7 @@ const KanbanCard = ({ task, index }) => {
                         onClose={() => setIsMoveModalOpen(false)}
                         task={task}
                         onMove={handleMoveTask}
-                        columnKeys={['backendBacklog', 'frontendBacklog', 'mobileBacklog', 'design', 'issues', 'todo', 'doing', 'testing', 'done']}
+                        columnKeys={['backendBacklog', 'frontendBacklog', 'mobileBacklog', 'design', 'todo', 'doing', 'testing', 'done']}
                     />
                     <Snackbar 
                         open={snackbarOpen} 

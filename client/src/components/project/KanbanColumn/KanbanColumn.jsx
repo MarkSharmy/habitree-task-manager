@@ -1,9 +1,9 @@
 import { useRef, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { MoreHorizontal, Plus, Upload, X, AlertCircle, Loader2, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Plus, Upload, X, AlertCircle, Loader2, Trash2, ArrowRight, CheckSquare } from 'lucide-react';
 import { Droppable } from '@hello-pangea/dnd';
-import { addTaskToColumn, addTasksFromCSV, deleteAllFromColumn } from '../../../store/slices/projectSlice';
+import { addTaskToColumn, addTasksFromCSV, deleteAllFromColumn, moveSelectedTasks, deleteSelectedTasks } from '../../../store/slices/projectSlice';
 import KanbanCard from '../KanbanCard/KanbanCard';
 import './kanbanColumn.css';
 
@@ -30,15 +30,17 @@ const parseCSVTitles = (text) => {
     return [...new Set(titles)]; // deduplicate
 };
 
-const KanbanColumn = ({ title, tasks, columnId }) => {
+const KanbanColumn = ({ title, tasks, columnId, allColumnKeys = [], selectedTasks = new Set(), onToggleSelect, onClearSelection }) => {
     const { id: projectId } = useParams();
     const dispatch = useDispatch();
 
-    const [menuOpen, setMenuOpen]         = useState(false);
-    const [csvPreview, setCsvPreview]     = useState([]);
-    const [csvError, setCsvError]         = useState('');
-    const [csvFileName, setCsvFileName]   = useState('');
-    const [importing, setImporting]       = useState(false);
+    const [menuOpen, setMenuOpen]             = useState(false);
+    const [moveSubOpen, setMoveSubOpen]       = useState(false);
+    const [csvPreview, setCsvPreview]         = useState([]);
+    const [csvError, setCsvError]             = useState('');
+    const [csvFileName, setCsvFileName]       = useState('');
+    const [importing, setImporting]           = useState(false);
+    const [bulkWorking, setBulkWorking]       = useState(false);
 
     const menuRef    = useRef(null);
     const csvFileRef = useRef(null);
@@ -127,6 +129,51 @@ const KanbanColumn = ({ title, tasks, columnId }) => {
         dispatch(deleteAllFromColumn({ projectId, columnId, taskIds }));
     };
 
+    // How many selected tasks are in THIS column
+    const selectedInColumn = tasks?.filter(t => selectedTasks.has(t._id)) || [];
+    const selectedCount    = selectedTasks.size;
+
+    const handleMoveSelected = async (toColumn) => {
+        setMenuOpen(false);
+        setMoveSubOpen(false);
+        if (!selectedCount) return;
+        setBulkWorking(true);
+
+        // Build [{ taskId, fromColumn }] by scanning all columns via task._id
+        // We pass columnId as fromColumn only for tasks that live in this column.
+        // Tasks selected in other columns are included too — KanbanColumn dispatches
+        // for the whole board so we gather fromColumn from the task's kanban field.
+        const tasksToMove = [...selectedTasks].map(taskId => {
+            // Find which column this task lives in from current tasks prop or fallback to columnId
+            const inThisCol = tasks?.find(t => t._id === taskId);
+            return { taskId, fromColumn: inThisCol?.kanban || columnId };
+        });
+
+        try {
+            await dispatch(moveSelectedTasks({ projectId, tasks: tasksToMove, toColumn })).unwrap();
+            onClearSelection?.();
+        } catch (err) {
+            console.error('Move selected failed:', err);
+        } finally {
+            setBulkWorking(false);
+        }
+    };
+
+    const handleDeleteSelected = async () => {
+        setMenuOpen(false);
+        if (!selectedCount) return;
+        if (!window.confirm(`Delete ${selectedCount} selected task${selectedCount !== 1 ? 's' : ''}? This cannot be undone.`)) return;
+        setBulkWorking(true);
+        try {
+            await dispatch(deleteSelectedTasks({ taskIds: [...selectedTasks] })).unwrap();
+            onClearSelection?.();
+        } catch (err) {
+            console.error('Delete selected failed:', err);
+        } finally {
+            setBulkWorking(false);
+        }
+    };
+
     return (
         <div className="kanban-column">
             <header className="column-header">
@@ -143,7 +190,7 @@ const KanbanColumn = ({ title, tasks, columnId }) => {
                     <div className="column-menu-wrapper" ref={menuRef}>
                         <button
                             className="icon-btn-small"
-                            onClick={() => setMenuOpen(o => !o)}
+                            onClick={() => { setMenuOpen(o => !o); setMoveSubOpen(false); }}
                             title="Column options"
                         >
                             <MoreHorizontal size={16} />
@@ -151,6 +198,51 @@ const KanbanColumn = ({ title, tasks, columnId }) => {
 
                         {menuOpen && (
                             <div className="column-dropdown">
+                                {/* ── Selection actions (shown when tasks are selected) ── */}
+                                {selectedCount > 0 && (
+                                    <>
+                                        {/* Move selected — sub-menu */}
+                                        <div className="column-dropdown-submenu-wrapper">
+                                            <button
+                                                className="column-dropdown-item"
+                                                onClick={() => setMoveSubOpen(o => !o)}
+                                            >
+                                                <ArrowRight size={14} />
+                                                Move {selectedCount} Selected
+                                                <span className="submenu-arrow">›</span>
+                                            </button>
+                                            {moveSubOpen && (
+                                                <div className="column-submenu">
+                                                    {allColumnKeys
+                                                        .filter(k => k !== columnId)
+                                                        .map(k => (
+                                                            <button
+                                                                key={k}
+                                                                className="column-dropdown-item"
+                                                                onClick={() => handleMoveSelected(k)}
+                                                                disabled={bulkWorking}
+                                                            >
+                                                                {k.replace(/([A-Z])/g, ' $1').toUpperCase()}
+                                                            </button>
+                                                        ))}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Delete selected */}
+                                        <button
+                                            className="column-dropdown-item column-dropdown-item--danger"
+                                            onClick={handleDeleteSelected}
+                                            disabled={bulkWorking}
+                                        >
+                                            <Trash2 size={14} /> Delete {selectedCount} Selected
+                                        </button>
+
+                                        <div className="column-dropdown-divider" />
+                                    </>
+                                )}
+
+                                {/* ── Standard column actions ── */}
                                 <button
                                     className="column-dropdown-item"
                                     onClick={() => {
@@ -224,7 +316,13 @@ const KanbanColumn = ({ title, tasks, columnId }) => {
                         {...provided.droppableProps}
                     >
                         {tasks?.map((task, index) => (
-                            <KanbanCard key={task._id} task={task} index={index} />
+                            <KanbanCard
+                                key={task._id}
+                                task={task}
+                                index={index}
+                                isSelected={selectedTasks.has(task._id)}
+                                onToggleSelect={onToggleSelect}
+                            />
                         ))}
                         {provided.placeholder}
                     </div>
