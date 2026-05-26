@@ -1,10 +1,11 @@
 import { useRef, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { MoreHorizontal, Plus, Upload, X, AlertCircle, Loader2, Trash2, ArrowRight, CheckSquare } from 'lucide-react';
+import { MoreHorizontal, Plus, Upload, X, AlertCircle, Loader2, Trash2, ArrowRight } from 'lucide-react';
 import { Droppable } from '@hello-pangea/dnd';
 import { addTaskToColumn, addTasksFromCSV, deleteAllFromColumn, moveSelectedTasks, deleteSelectedTasks } from '../../../store/slices/projectSlice';
 import KanbanCard from '../KanbanCard/KanbanCard';
+import MoveCardModal from '../../modals/Project/MoveCardModal';
 import './kanbanColumn.css';
 
 /* ── CSV parser (same logic as TaskDetails) ── */
@@ -35,7 +36,7 @@ const KanbanColumn = ({ title, tasks, columnId, allColumnKeys = [], selectedTask
     const dispatch = useDispatch();
 
     const [menuOpen, setMenuOpen]             = useState(false);
-    const [moveSubOpen, setMoveSubOpen]       = useState(false);
+    const [moveBulkModalOpen, setMoveBulkModalOpen] = useState(false);
     const [csvPreview, setCsvPreview]         = useState([]);
     const [csvError, setCsvError]             = useState('');
     const [csvFileName, setCsvFileName]       = useState('');
@@ -134,17 +135,11 @@ const KanbanColumn = ({ title, tasks, columnId, allColumnKeys = [], selectedTask
     const selectedCount    = selectedTasks.size;
 
     const handleMoveSelected = async (toColumn) => {
-        setMenuOpen(false);
-        setMoveSubOpen(false);
+        setMoveBulkModalOpen(false);
         if (!selectedCount) return;
         setBulkWorking(true);
 
-        // Build [{ taskId, fromColumn }] by scanning all columns via task._id
-        // We pass columnId as fromColumn only for tasks that live in this column.
-        // Tasks selected in other columns are included too — KanbanColumn dispatches
-        // for the whole board so we gather fromColumn from the task's kanban field.
         const tasksToMove = [...selectedTasks].map(taskId => {
-            // Find which column this task lives in from current tasks prop or fallback to columnId
             const inThisCol = tasks?.find(t => t._id === taskId);
             return { taskId, fromColumn: inThisCol?.kanban || columnId };
         });
@@ -190,7 +185,7 @@ const KanbanColumn = ({ title, tasks, columnId, allColumnKeys = [], selectedTask
                     <div className="column-menu-wrapper" ref={menuRef}>
                         <button
                             className="icon-btn-small"
-                            onClick={() => { setMenuOpen(o => !o); setMoveSubOpen(false); }}
+                            onClick={() => setMenuOpen(o => !o)}
                             title="Column options"
                         >
                             <MoreHorizontal size={16} />
@@ -198,38 +193,17 @@ const KanbanColumn = ({ title, tasks, columnId, allColumnKeys = [], selectedTask
 
                         {menuOpen && (
                             <div className="column-dropdown">
-                                {/* ── Selection actions (shown when tasks are selected) ── */}
+                                {/* ── Selection actions ── */}
                                 {selectedCount > 0 && (
                                     <>
-                                        {/* Move selected — sub-menu */}
-                                        <div className="column-dropdown-submenu-wrapper">
-                                            <button
-                                                className="column-dropdown-item"
-                                                onClick={() => setMoveSubOpen(o => !o)}
-                                            >
-                                                <ArrowRight size={14} />
-                                                Move {selectedCount} Selected
-                                                <span className="submenu-arrow">›</span>
-                                            </button>
-                                            {moveSubOpen && (
-                                                <div className="column-submenu">
-                                                    {allColumnKeys
-                                                        .filter(k => k !== columnId)
-                                                        .map(k => (
-                                                            <button
-                                                                key={k}
-                                                                className="column-dropdown-item"
-                                                                onClick={() => handleMoveSelected(k)}
-                                                                disabled={bulkWorking}
-                                                            >
-                                                                {k.replace(/([A-Z])/g, ' $1').toUpperCase()}
-                                                            </button>
-                                                        ))}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <button
+                                            className="column-dropdown-item"
+                                            onClick={() => { setMenuOpen(false); setMoveBulkModalOpen(true); }}
+                                        >
+                                            <ArrowRight size={14} />
+                                            Move {selectedCount} Selected
+                                        </button>
 
-                                        {/* Delete selected */}
                                         <button
                                             className="column-dropdown-item column-dropdown-item--danger"
                                             onClick={handleDeleteSelected}
@@ -245,10 +219,7 @@ const KanbanColumn = ({ title, tasks, columnId, allColumnKeys = [], selectedTask
                                 {/* ── Standard column actions ── */}
                                 <button
                                     className="column-dropdown-item"
-                                    onClick={() => {
-                                        setMenuOpen(false);
-                                        csvFileRef.current?.click();
-                                    }}
+                                    onClick={() => { setMenuOpen(false); csvFileRef.current?.click(); }}
                                 >
                                     <Upload size={14} /> Import from CSV
                                 </button>
@@ -328,6 +299,16 @@ const KanbanColumn = ({ title, tasks, columnId, allColumnKeys = [], selectedTask
                     </div>
                 )}
             </Droppable>
+
+            {/* Bulk move modal */}
+            <MoveCardModal
+                isOpen={moveBulkModalOpen}
+                onClose={() => setMoveBulkModalOpen(false)}
+                selectedCount={selectedCount}
+                onMoveSelected={handleMoveSelected}
+                columnKeys={allColumnKeys}
+                moving={bulkWorking}
+            />
         </div>
     );
 };

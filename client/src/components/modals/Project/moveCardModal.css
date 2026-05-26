@@ -106,3 +106,40 @@
 .move-submit-btn:hover {
     background: #2563eb;
 }
+/* Subtitle / task title hint */
+.move-modal-subtitle {
+    font-size: 0.825rem;
+    color: #64748b;
+    margin: 0;
+    padding: 0 0 0.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Rem-based sizing overrides */
+.move-modal-content {
+    width: 100%;
+    max-width: 20rem;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    gap: 1rem;
+}
+
+.move-submit-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+@media (max-width: 48rem) {
+    .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .move-modal-content {
+        border-radius: 1.25rem 1.25rem 0 0;
+        max-width: 100%;
+    }
+}
