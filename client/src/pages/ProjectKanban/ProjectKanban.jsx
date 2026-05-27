@@ -17,7 +17,7 @@ const formatColumnTitle = (key) => key.replace(/([A-Z])/g, ' $1').toUpperCase();
 const ProjectKanban = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
-    const { currentProject, loading, moveLoading } = useSelector(state => state.projects);
+    const { currentProject, loading, moveLoading, bulkMoveLoading } = useSelector(state => state.projects);
 
     // selectedTasks: Set of taskIds currently checked across ALL columns
     const [selectedTasks, setSelectedTasks] = useState(new Set());
@@ -101,14 +101,14 @@ const ProjectKanban = () => {
                 )}
 
                 <div className="kanban-board-wrapper">
-                    {moveLoading && (
+                    {(moveLoading || bulkMoveLoading) && (
                         <div className="kanban-move-overlay">
                             <PulseLoader color="#22c55e" size={12} />
                             <p>Updating Board...</p>
                         </div>
                     )}
 
-                    <div className={`kanban-board ${moveLoading ? 'board-blur' : ''}`}>
+                    <div className={`kanban-board ${(moveLoading || bulkMoveLoading) ? 'board-blur' : ''}`}>
                         {COLUMN_KEYS.map(key => (
                             <KanbanColumn
                                 key={key}

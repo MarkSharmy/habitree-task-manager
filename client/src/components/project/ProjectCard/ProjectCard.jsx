@@ -4,9 +4,23 @@ import { useNavigate } from 'react-router-dom';
 import Avatar from '../../../assets/profile.png';
 import './projectCard.css';
 
+const KANBAN_COLUMNS = [
+    'backendBacklog', 'frontendBacklog', 'mobileBacklog',
+    'design', 'issues', 'todo', 'doing', 'testing', 'done',
+    'blocked', 'onHold', 'trash',
+];
+
+const calcProjectProgress = (kanban) => {
+    if (!kanban) return 0;
+    const total = KANBAN_COLUMNS.reduce((sum, col) => sum + (kanban[col]?.length || 0), 0);
+    if (total === 0) return 0;
+    const done = kanban.done?.length || 0;
+    return Math.round((done / total) * 100);
+};
+
 const ProjectCard = ({ project }) => {
     const navigate = useNavigate();
-    const progressStyle = { width: `${project.progress || 0}%` };
+    const progress = calcProjectProgress(project.kanban);
 
     return (
         <div className="project-card" onClick={() => navigate(`/projects/${project._id}`)}>
@@ -22,7 +36,7 @@ const ProjectCard = ({ project }) => {
             <div className="progress-section">
                 <span className="label">Progress</span>
                 <div className="progress-bar-container">
-                    <div className="progress-fill" style={{ width: `${project.progress}%` }}></div>
+                    <div className="progress-fill" style={{ width: `${progress}%` }}></div>
                 </div>
             </div>
 

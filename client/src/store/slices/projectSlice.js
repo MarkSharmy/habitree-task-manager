@@ -181,6 +181,7 @@ const projectSlice = createSlice({
         error: null,
         createLoading: false, 
         moveLoading: false,
+        bulkMoveLoading: false,
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -269,7 +270,11 @@ const projectSlice = createSlice({
                     state.currentProject.kanban[columnId] = [];
                 }
             })
+            .addCase(moveSelectedTasks.pending, (state) => {
+                state.bulkMoveLoading = true;
+            })
             .addCase(moveSelectedTasks.fulfilled, (state, action) => {
+                state.bulkMoveLoading = false;
                 const { tasks, toColumn } = action.payload;
                 if (!state.currentProject) return;
                 for (const { taskId, fromColumn } of tasks) {
@@ -286,8 +291,7 @@ const projectSlice = createSlice({
                     }
                 }
             })
-            .addCase(deleteSelectedTasks.fulfilled, (state, action) => {
-                const { taskIds } = action.payload;
+            .addCase(deleteSelectedTasks.fulfilled, (state, action) => {                const { taskIds } = action.payload;
                 if (!state.currentProject) return;
                 const idSet = new Set(taskIds);
                 for (const col of Object.keys(state.currentProject.kanban)) {
@@ -320,6 +324,9 @@ const projectSlice = createSlice({
             .addCase(moveTaskBetweenColumns.rejected, (state, action) => {
                 state.moveLoading = false;
                 state.error = action.payload?.message;
+            })
+            .addCase(moveSelectedTasks.rejected, (state) => {
+                state.bulkMoveLoading = false;
             });
     }
 });
